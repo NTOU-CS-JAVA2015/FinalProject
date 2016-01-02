@@ -20,6 +20,7 @@ public class MDIEditor extends JFrame {
 
     WindowMenu wmWindow = new WindowMenu("視窗(W)", KeyEvent.VK_W);
     //控制內部視窗畫面切換的功能表
+   
 
     JMenuItem miCut, miCopy, miPaste; //執行編輯動作的功能表選項
     JCheckBoxMenuItem cbmiSize16, cbmiSize18, cbmiSize20;
@@ -38,12 +39,14 @@ public class MDIEditor extends JFrame {
         //取得內部框架使用的文字編輯面版
 
         JMenu mnFile = new JMenu("檔案(F)"); //宣告檔案功能表
+        JMenu mnAbout = new JMenu("關於(R)"); //宣告關於
         mnFile.setMnemonic(KeyEvent.VK_F); //設定檔案功能表使用的記憶鍵
 
         JMenuItem miNew = new JMenuItem("新增(N)", KeyEvent.VK_N),
                 miOpen = new JMenuItem("開啟舊檔(O)", KeyEvent.VK_O),
                 miSave = new JMenuItem("儲存檔案(S)", KeyEvent.VK_S),
                 miSaveAn = new JMenuItem("另存新檔(A)", KeyEvent.VK_A),
+                miYee = new JMenuItem("轉檔(Y)",KeyEvent.VK_Y),
                 miExit = new JMenuItem("結束(E)", KeyEvent.VK_E);
         //宣告檔案功能表的選項
 
@@ -51,12 +54,14 @@ public class MDIEditor extends JFrame {
         miOpen.addActionListener(alFile);
         miSave.addActionListener(alFile);
         miSaveAn.addActionListener(alFile);
+        miYee.addActionListener(alFile);
         miExit.addActionListener(alFile);
 
         mnFile.add(miNew); //將選項加入檔案功能表
         mnFile.add(miOpen);
         mnFile.add(miSave);
         mnFile.add(miSaveAn);
+        mnFile.add(miYee);
         mnFile.addSeparator();
         mnFile.add(miExit);
 
@@ -117,13 +122,14 @@ public class MDIEditor extends JFrame {
         bgSize.add(cbmiSize16); //將核取方塊選項加入按鈕群組
         bgSize.add(cbmiSize18);
         bgSize.add(cbmiSize20);
-
+        
         JMenuBar jmb = new JMenuBar(); //宣告功能表列物件
         setJMenuBar(jmb); //設定視窗框架使用的功能表列
         jmb.add(mnFile); //將功能表加入功能表列
         jmb.add(mnEdit);
         jmb.add(mnFontSize);
         jmb.add(wmWindow);
+        jmb.add(mnAbout);
 
         JToolBar tbFontSize = new JToolBar(); //新增工具列
 
