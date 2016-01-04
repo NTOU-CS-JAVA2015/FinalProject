@@ -526,9 +526,9 @@ public class MDIEditor extends JFrame {
         //傳回檔案篩選物件欲篩選檔案類型的描述字串
         @Override
         public String getDescription() {
-            if(extension.equals("txt")){
+            if (extension.equals("txt")) {
                 return "Text File";
-            }else{
+            } else {
                 return "PDF File";
             }
         }
