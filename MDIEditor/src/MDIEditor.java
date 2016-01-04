@@ -10,14 +10,6 @@ import javax.swing.filechooser.FileFilter;
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*; //引用處理事件的event套件
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class MDIEditor extends JFrame {
 
@@ -37,12 +29,12 @@ public class MDIEditor extends JFrame {
     JLabel lbStatus; //顯示游標位置與選取字元的標籤
     Action acCut, acCopy, acPaste; //執行編輯動作的Action物件
 
-    MDIEditor() {
+    MDIEditor(String title) {
+        super(title);//設定視窗名稱
         createInternalFrame(); //建立第一個內部框架
-
-        JTextPane tpCurrent = tifCurrent.getTextPane();
-        //取得內部框架使用的文字編輯面版
-
+        
+        JTextPane tpCurrent = tifCurrent.getTextPane(); //取得內部框架使用的文字編輯面版
+        
         JMenu mnFile = new JMenu("檔案(F)"); //宣告檔案功能表
         mnFile.setMnemonic(KeyEvent.VK_F); //設定檔案功能表使用的記憶鍵
 
@@ -50,7 +42,7 @@ public class MDIEditor extends JFrame {
                 miOpen = new JMenuItem("開啟舊檔(O)", KeyEvent.VK_O),
                 miSave = new JMenuItem("儲存檔案(S)", KeyEvent.VK_S),
                 miSaveAn = new JMenuItem("另存新檔(A)", KeyEvent.VK_A),
-                miYee = new JMenuItem("轉檔(Y)", KeyEvent.VK_Y),
+                miYee = new JMenuItem("PDF轉檔(Y)", KeyEvent.VK_Y),
                 miExit = new JMenuItem("結束(E)", KeyEvent.VK_E);
         //宣告檔案功能表的選項
 
@@ -97,14 +89,14 @@ public class MDIEditor extends JFrame {
         mnFontSize.setMnemonic(KeyEvent.VK_S); //設定字級功能表的記憶鍵
 
         FontSizeAction fsaSize16 = new FontSizeAction(
-                "16(S)", new ImageIcon("icon/size16.gif"),
-                "設定使用16級字", KeyEvent.VK_S),
+                "16(S)", new ImageIcon("icon/size16.png"),
+                "設定字體大小為16", KeyEvent.VK_S),
                 fsaSize18 = new FontSizeAction(
-                        "18(M)", new ImageIcon("icon/size18.gif"),
-                        "設定使用18級字", KeyEvent.VK_M),
+                        "18(M)", new ImageIcon("icon/size18.png"),
+                        "設定字體大小為18", KeyEvent.VK_M),
                 fsaSize20 = new FontSizeAction(
-                        "20(L)", new ImageIcon("icon/size20.gif"),
-                        "設定使用20級字", KeyEvent.VK_L);
+                        "20(L)", new ImageIcon("icon/size20.png"),
+                        "設定字體大小為20", KeyEvent.VK_L);
         //宣告執行字級大小設定動作的Action物件
 
         cbmiSize16 = new JCheckBoxMenuItem(fsaSize16);
@@ -129,33 +121,27 @@ public class MDIEditor extends JFrame {
 
         JMenu mnAbout = new JMenu("關於(R)"); //宣告關於
         mnAbout.setMnemonic(KeyEvent.VK_R); //設定檔案功能表使用的記憶鍵
-        JMenuItem miNatLee = new JMenuItem("00181034 李映澤", KeyEvent.VK_N),
-                miYuHang = new JMenuItem("00257122 張語航", KeyEvent.VK_N),
-                miFinianrry = new JMenuItem("00257138 吳彥澄", KeyEvent.VK_N),
-                miTommy = new JMenuItem("00257141 陳平揚", KeyEvent.VK_N),
-                miVic = new JMenuItem("00257148 陳威任", KeyEvent.VK_N),
-                miGitHub = new JMenuItem("GitHub", KeyEvent.VK_N);
-       
+        JMenuItem miIntroduce = new JMenuItem("Team Member"),
+                miNatLee = new JMenuItem("00181034 李映澤"),
+                miYuHang = new JMenuItem("00257122 張語航"),
+                miFinianrry = new JMenuItem("00257138 吳彥澄"),
+                miTommy = new JMenuItem("00257141 陳平揚"),
+                miVic = new JMenuItem("00257148 陳威任");
+
+        miNatLee.addActionListener(about);
+        miYuHang.addActionListener(about);
+        miFinianrry.addActionListener(about);
+        miTommy.addActionListener(about);
+        miVic.addActionListener(about);
+
+        mnAbout.add(miIntroduce);
+        mnAbout.addSeparator();
         mnAbout.add(miNatLee);
         mnAbout.add(miYuHang);
         mnAbout.add(miFinianrry);
         mnAbout.add(miTommy);
         mnAbout.add(miVic);
-        mnAbout.add(miGitHub );
-        
-        miGitHub.addActionListener( (ActionEvent e) ->
-            {
-                try {
-                    Desktop desktop = Desktop.getDesktop();
-                 desktop.browse(new  URI("https://github.com/NTOU-CS-JAVA2015") );
-                 } catch (IOException ex) {
-                    Logger.getLogger(MDIEditor.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (URISyntaxException ex) {
-                    Logger.getLogger(MDIEditor.class.getName()).log(Level.SEVERE, null, ex);
-                 }
-            }
-        );
-        
+
         JMenuBar jmb = new JMenuBar(); //宣告功能表列物件
         setJMenuBar(jmb); //設定視窗框架使用的功能表列
         jmb.add(mnFile); //將功能表加入功能表列
@@ -256,6 +242,7 @@ public class MDIEditor extends JFrame {
     InternalFrameAdapter ifl = new InternalFrameAdapter() {
 
         //當內部框架取得游標焦點觸發事件將由此方法回應
+        @Override
         public void internalFrameActivated(InternalFrameEvent e) {
 
             tifCurrent = (TextInternalFrame) e.getInternalFrame();
@@ -283,6 +270,7 @@ public class MDIEditor extends JFrame {
         }
 
         //當內部框架正在關閉時所觸發事件將由此方法回應
+        @Override
         public void internalFrameClosing(InternalFrameEvent e) {
             wmWindow.remove(tifCurrent.getMenuItem());
             //移除視窗功能表內代表目前執行編輯之TextInternalFrame物件的選項
@@ -293,10 +281,11 @@ public class MDIEditor extends JFrame {
     CaretListener cl = new CaretListener() {
 
         //移動游標位置時, 將由此方法回應
+        @Override
         public void caretUpdate(CaretEvent e) {
 
             if (e.getDot() != e.getMark()) {
-                lbStatus.setText("游標位置 : 第 " + e.getDot()
+                lbStatus.setText("目前位置 : 第 " + e.getDot()
                         + " 個字元" + ", 選取範圍 : " + e.getDot() + "至" + e.getMark());
                 //設定狀態列內的文字
 
@@ -304,7 +293,7 @@ public class MDIEditor extends JFrame {
                 acCopy.setEnabled(true);
                 //設定執行剪下與複製動字的Action元件為有效
             } else {
-                lbStatus.setText("游標位置 : 第 " + e.getDot() + " 個字元");
+                lbStatus.setText("目前位置 : 第 " + e.getDot() + " 個字元");
                 //設定狀態列內的文字
 
                 acCut.setEnabled(false);
@@ -339,23 +328,27 @@ public class MDIEditor extends JFrame {
             putValue(MNEMONIC_KEY, mnemonic); //設定記憶鍵
         }
 
-        public void actionPerformed(ActionEvent e) { //回應事件的執行動作			
-
+        @Override
+        public void actionPerformed(ActionEvent e) { //回應事件的執行動作
             //依照動作命令字串判別欲執行的動作
-            if (e.getActionCommand().equals("20(L)")) {
-                tifCurrent.setFontSize(20);
-                //設定文字編輯面版使用20級字
-
-                cbmiSize20.setSelected(true); //設定對應的控制項為選取
-                tbnSize20.setSelected(true);
-            } else if (e.getActionCommand().equals("18(M)")) {
-                tifCurrent.setFontSize(18);
-                cbmiSize18.setSelected(true);
-                tbnSize18.setSelected(true);
-            } else {
-                tifCurrent.setFontSize(16);
-                cbmiSize16.setSelected(true);
-                tbnSize16.setSelected(true);
+            switch (e.getActionCommand()) {
+                case "20(L)":
+                    tifCurrent.setFontSize(20);
+                    //設定文字編輯面版使用20級字
+                    cbmiSize20.setSelected(true); //設定對應的控制項為選取
+                    tbnSize20.setSelected(true);
+                    break;
+                case "18(M)":
+                    tifCurrent.setFontSize(18);
+                    cbmiSize18.setSelected(true);
+                    tbnSize18.setSelected(true);
+                    break;
+                default:
+                    //預設16級字
+                    tifCurrent.setFontSize(16);
+                    cbmiSize16.setSelected(true);
+                    tbnSize16.setSelected(true);
+                    break;
             }
         }
     }
@@ -365,68 +358,103 @@ public class MDIEditor extends JFrame {
         int result;
         try {
             //執行檔案開啟動作
-            if (e.getActionCommand().equals("開啟舊檔(O)")) {
-                JFileChooser fcOpen = new JFileChooser(
-                        tifCurrent.getFilePath());
-                //宣告JFileChooser物件
-                fcOpen.addChoosableFileFilter(new TxtFileFilter("txt"));
-                //設定篩選檔案的類型
-                fcOpen.setDialogTitle("開啟舊檔"); //設定檔案選擇對話盒的標題
-                result = fcOpen.showOpenDialog(MDIEditor.this);
-                //顯示開啟檔案對話盒
-                if (result == JFileChooser.APPROVE_OPTION) { //使用者按下 確認 按鈕
-                    File file = fcOpen.getSelectedFile(); //取得選取的檔案
-                    createInternalFrame(file.getPath(), file.getName());
-                    //以取得的檔案建立TextInternalFrame物件
+            switch (e.getActionCommand()) {
+                case "開啟舊檔(O)": {
+                    JFileChooser fcOpen = new JFileChooser(
+                            tifCurrent.getFilePath());
+                    //宣告JFileChooser物件
+                    fcOpen.addChoosableFileFilter(new TxtFileFilter("txt"));
+                    //設定篩選檔案的類型
+                    fcOpen.setDialogTitle("開啟舊檔"); //設定檔案選擇對話盒的標題
+                    result = fcOpen.showOpenDialog(MDIEditor.this);
+                    //顯示開啟檔案對話盒
+                    if (result == JFileChooser.APPROVE_OPTION) { //使用者按下 確認 按鈕
+                        File file = fcOpen.getSelectedFile(); //取得選取的檔案
+                        createInternalFrame(file.getPath(), file.getName());
+                        //以取得的檔案建立TextInternalFrame物件
+                    }
+                    break;
                 }
-            } else if (e.getActionCommand().equals("新增(N)")) { //新增文件
-                createInternalFrame(); //建立沒有內容的TextInternalFrame物件
-            } else if (e.getActionCommand().equals("儲存檔案(S)")) {
-                //執行儲存檔案動作
-                String strPath = tifCurrent.getFilePath();
-                //取得目前TextInternalFrame物件開啟檔案的路徑與名稱
-                if (!tifCurrent.isNew()) {
-                    //判斷TextInternalFrame物件開啟的是否為新的檔案
-                    FileWriter fw = new FileWriter(strPath);
-                    //建立輸出檔案的FileWriter物件
-                    tifCurrent.write(fw);
-                } else {
-                    saveFile(strPath); //儲存檔案
+                case "新增(N)":
+                    //新增文件
+                    createInternalFrame(); //建立沒有內容的TextInternalFrame物件
+                    break;
+                case "儲存檔案(S)":
+                    //執行儲存檔案動作
+                    String strPath = tifCurrent.getFilePath();
+                    //取得目前TextInternalFrame物件開啟檔案的路徑與名稱
+                    if (!tifCurrent.isNew()) {
+                        //判斷TextInternalFrame物件開啟的是否為新的檔案
+                        FileWriter fw = new FileWriter(strPath);
+                        //建立輸出檔案的FileWriter物件
+                        tifCurrent.write(fw);
+                    } else {
+                        saveFile(strPath); //儲存檔案
+                    }
+                    break;
+                case "另存新檔(A)":
+                    saveFile(tifCurrent.getFilePath()); //儲存檔案
+                    break;
+                case "PDF轉檔(Y)": {
+                    JFileChooser fcOpen = new JFileChooser(
+                            tifCurrent.getFilePath());
+                    //宣告JFileChooser物件
+                    fcOpen.addChoosableFileFilter(new TxtFileFilter("pdf"));
+                    //設定篩選檔案的類型
+                    fcOpen.setDialogTitle("選擇要轉檔的PDF"); //設定檔案選擇對話盒的標題
+                    result = fcOpen.showOpenDialog(MDIEditor.this);
+                    //顯示開啟檔案對話盒
+                    if (result == JFileChooser.APPROVE_OPTION) { //使用者按下 確認 按鈕
+                        File file = fcOpen.getSelectedFile(); //取得選取的檔案
+                        System.setProperty("apple.awt.UIElement", "true");
+                        ExtractText extractor = new ExtractText();
+                        String fi[] = {file.getPath()};
+                        String fe, ff;
+                        extractor.startExtraction(fi);
+                        fe = fi[0].substring(0, fi[0].length() - 3) + "txt";
+                        ff = file.getName().substring(0, file.getName().length() - 3) + "txt";
+                        createInternalFrame(fe, ff);
+                        //以取得的檔案建立TextInternalFrame物件
+                    }
+                    break;
                 }
-            } else if (e.getActionCommand().equals("另存新檔(A)")) {
-                saveFile(tifCurrent.getFilePath()); //儲存檔案
-            } else if (e.getActionCommand().equals("轉檔(Y)")) {
-                JFileChooser fcOpen = new JFileChooser(
-                        tifCurrent.getFilePath());
-                //宣告JFileChooser物件
-                fcOpen.addChoosableFileFilter(new TxtFileFilter("pdf"));
-                //設定篩選檔案的類型
-                fcOpen.setDialogTitle("選擇要轉檔的PDF"); //設定檔案選擇對話盒的標題
-                result = fcOpen.showOpenDialog(MDIEditor.this);
-                //顯示開啟檔案對話盒
-                if (result == JFileChooser.APPROVE_OPTION) { //使用者按下 確認 按鈕
-                    File file = fcOpen.getSelectedFile(); //取得選取的檔案
-                    
-                    System.setProperty("apple.awt.UIElement", "true");
-                    ExtractText extractor = new ExtractText();
-                    String fi[]={file.getPath()};
-                    String fe,ff;
-                    extractor.startExtraction(fi);
-                    fe=fi[0].substring(0,fi[0].length()-3)+"txt";
-                    ff=file.getName().substring(0,file.getName().length()-3)+"txt";
-                    createInternalFrame(fe, ff);
-                    //以取得的檔案建立TextInternalFrame物件
-                }
-            } else if (e.getActionCommand().equals("結束(E)")) {
-                MDIEditor.this.processWindowEvent(
-                        new WindowEvent(MDIEditor.this,
-                                WindowEvent.WINDOW_CLOSING));
-                //執行WindowEvent事件, 觸發MDIEditor視窗框架的關閉視窗事件
+                case "結束(E)":
+                    MDIEditor.this.processWindowEvent(
+                            new WindowEvent(MDIEditor.this,
+                                    WindowEvent.WINDOW_CLOSING));
+                    //執行WindowEvent事件, 觸發MDIEditor視窗框架的關閉視窗事件
+                    break;
             }
         } catch (IOException ioe) {
             System.err.println(ioe.toString());
         } catch (BadLocationException ble) {
             System.err.println("位置不正確");
+        }
+    };
+
+    ActionListener about = (ActionEvent e) -> {
+        try {
+            String url = "";
+            switch (e.getActionCommand()) {
+                case "00181034 李映澤":
+                    url = "https://github.com/NatLee";
+                    break;
+                case "00257122 張語航":
+                    url = "https://github.com/changyuhang";
+                    break;
+                case "00257138 吳彥澄":
+                    url = "https://github.com/FinianWu";
+                    break;
+                case "00257141 陳平揚":
+                    url = "https://github.com/ethanhunt0707";
+                    break;
+                case "00257148 陳威任":
+                    url = "https://github.com/vic4113110631";
+                    break;
+            }
+            Runtime.getRuntime().exec("cmd /c start " + url);
+        } catch (IOException ioe) {
+            System.err.println(ioe.toString());
         }
     };
 
@@ -496,7 +524,11 @@ public class MDIEditor extends JFrame {
         //傳回檔案篩選物件欲篩選檔案類型的描述字串
         @Override
         public String getDescription() {
-            return "Text File";
+            if(extension.equals("txt")){
+                return "Text File";
+            }else{
+                return "PDF File";
+            }
         }
     }
 
@@ -571,6 +603,6 @@ public class MDIEditor extends JFrame {
     };
 
     public static void main(String args[]) {
-        MDIEditor api = new MDIEditor(); //建立視窗框架	
+        MDIEditor api = new MDIEditor("PDF轉TXT文字閱讀編輯器"); //建立視窗框架	
     }
 }
