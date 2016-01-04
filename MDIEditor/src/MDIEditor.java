@@ -20,7 +20,6 @@ public class MDIEditor extends JFrame {
 
     WindowMenu wmWindow = new WindowMenu("視窗(W)", KeyEvent.VK_W);
     //控制內部視窗畫面切換的功能表
-   
 
     JMenuItem miCut, miCopy, miPaste; //執行編輯動作的功能表選項
     JCheckBoxMenuItem cbmiSize16, cbmiSize18, cbmiSize20;
@@ -39,15 +38,13 @@ public class MDIEditor extends JFrame {
         //取得內部框架使用的文字編輯面版
 
         JMenu mnFile = new JMenu("檔案(F)"); //宣告檔案功能表
-        JMenu mnAbout = new JMenu("關於(R)"); //宣告關於
         mnFile.setMnemonic(KeyEvent.VK_F); //設定檔案功能表使用的記憶鍵
-        mnAbout.setMnemonic(KeyEvent.VK_R); //設定檔案功能表使用的記憶鍵
 
         JMenuItem miNew = new JMenuItem("新增(N)", KeyEvent.VK_N),
                 miOpen = new JMenuItem("開啟舊檔(O)", KeyEvent.VK_O),
                 miSave = new JMenuItem("儲存檔案(S)", KeyEvent.VK_S),
                 miSaveAn = new JMenuItem("另存新檔(A)", KeyEvent.VK_A),
-                miYee = new JMenuItem("轉檔(Y)",KeyEvent.VK_Y),
+                miYee = new JMenuItem("轉檔(Y)", KeyEvent.VK_Y),
                 miExit = new JMenuItem("結束(E)", KeyEvent.VK_E);
         //宣告檔案功能表的選項
 
@@ -123,7 +120,21 @@ public class MDIEditor extends JFrame {
         bgSize.add(cbmiSize16); //將核取方塊選項加入按鈕群組
         bgSize.add(cbmiSize18);
         bgSize.add(cbmiSize20);
-        
+
+        JMenu mnAbout = new JMenu("關於(R)"); //宣告關於
+        mnAbout.setMnemonic(KeyEvent.VK_R); //設定檔案功能表使用的記憶鍵
+        JMenuItem miNatLee = new JMenuItem("00181034 李映澤", KeyEvent.VK_N),
+                miYuHang = new JMenuItem("00257122 張語航", KeyEvent.VK_N),
+                miFinianrry = new JMenuItem("00257138 吳彥澄", KeyEvent.VK_N),
+                miTommy = new JMenuItem("00257141 陳平揚", KeyEvent.VK_N),
+                miVic = new JMenuItem("00257148 陳威任", KeyEvent.VK_N);
+
+        mnAbout.add(miNatLee);
+        mnAbout.add(miYuHang);
+        mnAbout.add(miFinianrry);
+        mnAbout.add(miTommy);
+        mnAbout.add(miVic);
+
         JMenuBar jmb = new JMenuBar(); //宣告功能表列物件
         setJMenuBar(jmb); //設定視窗框架使用的功能表列
         jmb.add(mnFile); //將功能表加入功能表列
@@ -230,7 +241,7 @@ public class MDIEditor extends JFrame {
             //取得觸發InternalFrame事件的TextInternalFrame物件
 
             tifCurrent.getMenuItem().setSelected(true);
-			//設定視窗功能表內代表此TextInternalFrame物件的核取方塊選項為選取
+            //設定視窗功能表內代表此TextInternalFrame物件的核取方塊選項為選取
 
             //取得TextInternalFrame物件顯示內容使用的字級大小
             switch (tifCurrent.getFontSize()) {
@@ -363,6 +374,28 @@ public class MDIEditor extends JFrame {
                 }
             } else if (e.getActionCommand().equals("另存新檔(A)")) {
                 saveFile(tifCurrent.getFilePath()); //儲存檔案
+            } else if (e.getActionCommand().equals("轉檔(Y)")) {
+                JFileChooser fcOpen = new JFileChooser(
+                        tifCurrent.getFilePath());
+                //宣告JFileChooser物件
+                fcOpen.addChoosableFileFilter(new TxtFileFilter("pdf"));
+                //設定篩選檔案的類型
+                fcOpen.setDialogTitle("選擇要轉檔的PDF"); //設定檔案選擇對話盒的標題
+                result = fcOpen.showOpenDialog(MDIEditor.this);
+                //顯示開啟檔案對話盒
+                if (result == JFileChooser.APPROVE_OPTION) { //使用者按下 確認 按鈕
+                    File file = fcOpen.getSelectedFile(); //取得選取的檔案
+                    
+                    System.setProperty("apple.awt.UIElement", "true");
+                    ExtractText extractor = new ExtractText();
+                    String fi[]={file.getPath()};
+                    String fe,ff;
+                    extractor.startExtraction(fi);
+                    fe=fi[0].substring(0,fi[0].length()-3)+"txt";
+                    ff=file.getName().substring(0,file.getName().length()-3)+"txt";
+                    createInternalFrame(fe, ff);
+                    //以取得的檔案建立TextInternalFrame物件
+                }
             } else if (e.getActionCommand().equals("結束(E)")) {
                 MDIEditor.this.processWindowEvent(
                         new WindowEvent(MDIEditor.this,
@@ -428,7 +461,7 @@ public class MDIEditor extends JFrame {
 
             if (i > 0 && i < s.length() - 1) {
                 ext = s.substring(i + 1).toLowerCase();
-				//從檔案名稱內取得副檔名字
+                //從檔案名稱內取得副檔名字
 
                 //判斷副檔名是否與檔案篩選物件的extension字串相同
                 if (ext.equals(extension)) {
@@ -459,7 +492,7 @@ public class MDIEditor extends JFrame {
 
             TextInternalFrame tifCurrent
                     = (TextInternalFrame) getDesktopPane().getSelectedFrame();
-			//取得虛擬桌面目前選取的TextInternalFrame物件
+            //取得虛擬桌面目前選取的TextInternalFrame物件
 
             //判斷開啟的TextInternalFrame物件是否為0
             if (ifAll.length != 0) {
