@@ -41,7 +41,6 @@ class WindowMenu extends JMenu implements ActionListener {
         JInternalFrame tifCurrent
                 = hmMenuItem.get((JCheckBoxMenuItem) e.getSource());
         //運用核取方塊選項從HashMap容器取得對應的TextInternalFrame物件
-
         try {
             tifCurrent.setSelected(true); //設定取得的TextInternalFrame物件為選取
         } catch (java.beans.PropertyVetoException pve) {

@@ -10,8 +10,8 @@ import java.io.*;
 class TextInternalFrame extends JInternalFrame {
 
     JTextPane tpContent = new JTextPane(); //宣告文字編輯面版
-    String strFilePath = "C:\\未命名.txt"; //編輯檔案的預設檔案路徑
-    String strFileName = "未命名.txt"; //編輯檔案的預設檔案名稱
+    String strFilePath = "C:\\新文字文件.txt"; //編輯檔案的預設檔案路徑
+    String strFileName = "新文字文件.txt"; //編輯檔案的預設檔案名稱
     boolean isNew = true, //判別編輯檔案是否為新開啟檔案的布林值
             changed = false; //判別編輯檔案內容是否改變的布林值
     JCheckBoxMenuItem cbmi; //代表內部框架的核取方塊選項,
