@@ -33,8 +33,7 @@ public class MDIEditor extends JFrame {
         super(title);//設定視窗名稱
         createInternalFrame(); //建立第一個內部框架
 
-        JTextPane tpCurrent = tifCurrent.getTextPane();
-        //取得內部框架使用的文字編輯面版
+        JTextPane tpCurrent = tifCurrent.getTextPane(); //取得內部框架使用的文字編輯面版
 
         JMenu mnFile = new JMenu("檔案(F)"); //宣告檔案功能表
         mnFile.setMnemonic(KeyEvent.VK_F); //設定檔案功能表使用的記憶鍵
@@ -90,14 +89,14 @@ public class MDIEditor extends JFrame {
         mnFontSize.setMnemonic(KeyEvent.VK_S); //設定字級功能表的記憶鍵
 
         FontSizeAction fsaSize16 = new FontSizeAction(
-                "16(S)", new ImageIcon("icon/size16.gif"),
-                "設定使用16級字", KeyEvent.VK_S),
+                "16(S)", new ImageIcon("icon/size16.png"),
+                "設定字體大小為16", KeyEvent.VK_S),
                 fsaSize18 = new FontSizeAction(
-                        "18(M)", new ImageIcon("icon/size18.gif"),
-                        "設定使用18級字", KeyEvent.VK_M),
+                        "18(M)", new ImageIcon("icon/size18.png"),
+                        "設定字體大小為18", KeyEvent.VK_M),
                 fsaSize20 = new FontSizeAction(
-                        "20(L)", new ImageIcon("icon/size20.gif"),
-                        "設定使用20級字", KeyEvent.VK_L);
+                        "20(L)", new ImageIcon("icon/size20.png"),
+                        "設定字體大小為20", KeyEvent.VK_L);
         //宣告執行字級大小設定動作的Action物件
 
         cbmiSize16 = new JCheckBoxMenuItem(fsaSize16);
@@ -407,7 +406,6 @@ public class MDIEditor extends JFrame {
                     //顯示開啟檔案對話盒
                     if (result == JFileChooser.APPROVE_OPTION) { //使用者按下 確認 按鈕
                         File file = fcOpen.getSelectedFile(); //取得選取的檔案
-
                         System.setProperty("apple.awt.UIElement", "true");
                         ExtractText extractor = new ExtractText();
                         String fi[] = {file.getPath()};
@@ -526,11 +524,7 @@ public class MDIEditor extends JFrame {
         //傳回檔案篩選物件欲篩選檔案類型的描述字串
         @Override
         public String getDescription() {
-            if(extension.equals("txt")){
-                return "Text File";
-            }else{
-                return "PDF File";
-            }
+            return extension.equals("txt") ? "Text File" : "PDF File";
         }
     }
 

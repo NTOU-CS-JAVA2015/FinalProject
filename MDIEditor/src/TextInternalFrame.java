@@ -2,7 +2,6 @@
 import javax.swing.*;
 import javax.swing.text.*;
 import javax.swing.event.*;
-
 import java.awt.*;
 import java.io.*;
 
@@ -10,6 +9,8 @@ import java.io.*;
 class TextInternalFrame extends JInternalFrame {
 
     JTextPane tpContent = new JTextPane(); //宣告文字編輯面版
+    
+    
     String strFilePath = "C:\\新文字文件.txt"; //編輯檔案的預設檔案路徑
     String strFileName = "新文字文件.txt"; //編輯檔案的預設檔案名稱
     boolean isNew = true, //判別編輯檔案是否為新開啟檔案的布林值
