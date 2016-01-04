@@ -1,6 +1,5 @@
 # FinalProject
 
-Test是PDF轉TXT功能  
 目標：  
 > 1. ~~測試功能是否可行~~ 
 > 2. ~~與原UI功能合併~~  
