@@ -41,6 +41,7 @@ public class MDIEditor extends JFrame {
         JMenu mnFile = new JMenu("檔案(F)"); //宣告檔案功能表
         JMenu mnAbout = new JMenu("關於(R)"); //宣告關於
         mnFile.setMnemonic(KeyEvent.VK_F); //設定檔案功能表使用的記憶鍵
+        mnAbout.setMnemonic(KeyEvent.VK_R); //設定檔案功能表使用的記憶鍵
 
         JMenuItem miNew = new JMenuItem("新增(N)", KeyEvent.VK_N),
                 miOpen = new JMenuItem("開啟舊檔(O)", KeyEvent.VK_O),
