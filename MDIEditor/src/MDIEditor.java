@@ -32,9 +32,9 @@ public class MDIEditor extends JFrame {
     MDIEditor(String title) {
         super(title);//設定視窗名稱
         createInternalFrame(); //建立第一個內部框架
-        
+
         JTextPane tpCurrent = tifCurrent.getTextPane(); //取得內部框架使用的文字編輯面版
-        
+
         JMenu mnFile = new JMenu("檔案(F)"); //宣告檔案功能表
         mnFile.setMnemonic(KeyEvent.VK_F); //設定檔案功能表使用的記憶鍵
 
@@ -524,11 +524,7 @@ public class MDIEditor extends JFrame {
         //傳回檔案篩選物件欲篩選檔案類型的描述字串
         @Override
         public String getDescription() {
-            if(extension.equals("txt")){
-                return "Text File";
-            }else{
-                return "PDF File";
-            }
+            return extension.equals("txt") ? "Text File" : "PDF File";
         }
     }
 
