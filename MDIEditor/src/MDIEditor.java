@@ -29,6 +29,9 @@ public class MDIEditor extends JFrame {
     JLabel lbStatus; //顯示游標位置與選取字元的標籤
     Action acCut, acCopy, acPaste; //執行編輯動作的Action物件
 
+    AudioPlayer audio = null;
+    boolean musicFlag = false;//判斷是否開啟過音樂
+
     MDIEditor(String title) {
         super(title);//設定視窗名稱
         createInternalFrame(); //建立第一個內部框架
@@ -121,6 +124,26 @@ public class MDIEditor extends JFrame {
         bgSize.add(cbmiSize18);
         bgSize.add(cbmiSize20);
 
+        JMenu mnMusic = new JMenu("音樂(M)"); //宣告關於
+        mnMusic.setMnemonic(KeyEvent.VK_M); //設定檔案功能表使用的記憶鍵
+
+        JMenuItem miOpenMusic = new JMenuItem("播放WAV檔音樂(O)", KeyEvent.VK_O),
+                miPause = new JMenuItem("暫停(P)", KeyEvent.VK_P),
+                miContinue = new JMenuItem("繼續(K)", KeyEvent.VK_K),
+                miStop = new JMenuItem("停止(T)", KeyEvent.VK_T);
+
+        miOpenMusic.addActionListener(music); //為功能表選項加上監聽器
+        miPause.addActionListener(music);
+        miContinue.addActionListener(music);
+        miStop.addActionListener(music);
+
+        mnMusic.add(miOpenMusic); //將選項加入檔案功能表
+        mnMusic.addSeparator();
+        mnMusic.add(miPause);
+        mnMusic.add(miContinue);
+        mnMusic.addSeparator();
+        mnMusic.add(miStop);
+
         JMenu mnAbout = new JMenu("關於(R)"); //宣告關於
         mnAbout.setMnemonic(KeyEvent.VK_R); //設定檔案功能表使用的記憶鍵
         JMenuItem miIntroduce = new JMenuItem("Team Member"),
@@ -150,6 +173,7 @@ public class MDIEditor extends JFrame {
         jmb.add(mnEdit);
         jmb.add(mnFontSize);
         jmb.add(wmWindow);
+        jmb.add(mnMusic);
         jmb.add(mnAbout);
 
         JToolBar tbFontSize = new JToolBar(); //新增工具列
@@ -434,6 +458,59 @@ public class MDIEditor extends JFrame {
         }
     };
 
+    ActionListener music = (ActionEvent e) -> {
+        int result;
+        switch (e.getActionCommand()) {
+            case "播放WAV檔音樂(O)":
+                if (musicFlag) {
+                    JOptionPane.showMessageDialog(dpPane, "醒醒吧！你沒聽到聲音嗎？\n或許真的沒聽到？請停止播放再開檔！");
+                }
+                if (!musicFlag) {
+                    JFileChooser fcOpen = new JFileChooser(
+                            tifCurrent.getFilePath());
+                    //宣告JFileChooser物件
+                    fcOpen.addChoosableFileFilter(new TxtFileFilter("wav"));
+                    //設定篩選檔案的類型
+                    fcOpen.setDialogTitle("開啟WAV檔"); //設定檔案選擇對話盒的標題
+                    result = fcOpen.showOpenDialog(MDIEditor.this);
+                    //顯示開啟檔案對話盒
+                    if (result == JFileChooser.APPROVE_OPTION) {
+                        //使用者按下 確認 按鈕
+                        musicFlag = true;
+                        File file = fcOpen.getSelectedFile(); //取得選取的檔案
+                        audio = new AudioPlayer();
+                        audio.loadAudio(file.getPath());
+                        audio.setPlayCount(0);//0為持續播放
+                        audio.play();
+                    }
+                }
+                break;
+            case "暫停(P)":
+                if (musicFlag) {
+                    audio.pause();
+                } else {
+                    JOptionPane.showMessageDialog(dpPane, "醒醒吧！你還沒開音樂！");
+                }
+                break;
+            case "繼續(K)":
+                if (musicFlag) {
+                    audio.resume();
+                } else {
+                    JOptionPane.showMessageDialog(dpPane, "醒醒吧！你還沒開音樂！");
+                }
+                break;
+            case "停止(T)":
+                if (musicFlag) {
+                    audio.close();
+                    JOptionPane.showMessageDialog(dpPane, "要再次播放請重新選擇音樂！");
+                    musicFlag = false;
+                } else {
+                    JOptionPane.showMessageDialog(dpPane, "醒醒吧！你還沒開音樂！");
+                }
+                break;
+        }
+    };
+
     ActionListener about = (ActionEvent e) -> {
         try {
             String url = "";
@@ -526,7 +603,7 @@ public class MDIEditor extends JFrame {
         //傳回檔案篩選物件欲篩選檔案類型的描述字串
         @Override
         public String getDescription() {
-            return extension.equals("txt") ? "Text File" : "PDF File";
+            return "篩選所需要的檔案";
         }
     }
 
