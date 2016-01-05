@@ -1,6 +1,7 @@
 
 import javax.sound.sampled.*;
 
+
 import java.io.*;
 import java.net.*;
 
@@ -13,7 +14,8 @@ import java.net.*;
 public final class AudioPlayer {
 
     private AudioInputStream currentSound;
-
+    
+    
     private Clip clip;
 
     private float gain;
@@ -35,7 +37,6 @@ public final class AudioPlayer {
     private AudioFormat format;
 
     //音樂播放完畢時，若有設定回call的對象，則會通知此對象
-    private Object callbackObj;
     private boolean isPause;
 
     public AudioPlayer() {
@@ -378,6 +379,5 @@ public final class AudioPlayer {
         dlInfo = null;
         loadReference = null;
         muteControl = null;
-        callbackObj = null;
     }
 }
