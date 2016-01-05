@@ -434,6 +434,8 @@ public class MDIEditor extends JFrame {
                     result = fcOpen.showOpenDialog(MDIEditor.this);
                     //顯示開啟檔案對話盒
                     if (result == JFileChooser.APPROVE_OPTION) { //使用者按下 確認 按鈕
+                        AudioPlayer openYee =new AudioPlayer(file.getPath());
+                        openYee.play();
                         File file = fcOpen.getSelectedFile(); //取得選取的檔案
                         try{
                         openYee.loadAudio(Yee);//載入yee
