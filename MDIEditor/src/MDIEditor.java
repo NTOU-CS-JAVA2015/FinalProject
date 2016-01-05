@@ -29,7 +29,10 @@ public class MDIEditor extends JFrame {
     JLabel lbStatus; //顯示游標位置與選取字元的標籤
     Action acCut, acCopy, acPaste; //執行編輯動作的Action物件
 
-    AudioPlayer audio = null;
+    AudioPlayer openYee=new AudioPlayer();//轉檔音效控制項
+    java.net.URL Yee = MDIEditor.class.getResource("/voice/Yee.aiff");//取得Yee.aiff的URL
+    
+    AudioPlayer audio = null;//音樂控制項
     boolean musicFlag = false;//判斷是否開啟過音樂
 
     MDIEditor(String title) {
@@ -422,8 +425,6 @@ public class MDIEditor extends JFrame {
                     saveFile(tifCurrent.getFilePath()); //儲存檔案
                     break;
                 case "PDF轉檔(Y)": {
-                    AudioPlayer openYee =new AudioPlayer(file.getPath());
-                    openYee.play();
                     JFileChooser fcOpen = new JFileChooser(
                             tifCurrent.getFilePath());
                     //宣告JFileChooser物件
@@ -434,6 +435,12 @@ public class MDIEditor extends JFrame {
                     //顯示開啟檔案對話盒
                     if (result == JFileChooser.APPROVE_OPTION) { //使用者按下 確認 按鈕
                         File file = fcOpen.getSelectedFile(); //取得選取的檔案
+                        try{
+                        openYee.loadAudio(Yee);//載入yee
+                        }catch(Exception YeeException){
+                            System.out.println(YeeException.toString());
+                        }
+                        openYee.play();
                         System.setProperty("apple.awt.UIElement", "true");
                         ExtractText extractor = new ExtractText();
                         String fi[] = {file.getPath()};
@@ -680,6 +687,6 @@ public class MDIEditor extends JFrame {
     };
 
     public static void main(String args[]) {
-        MDIEditor api = new MDIEditor("PDF轉TXT文字閱讀編輯器"); //建立視窗框架	
+        MDIEditor api = new MDIEditor("PDF to TXT Editor with Music"); //建立視窗框架	
     }
 }
