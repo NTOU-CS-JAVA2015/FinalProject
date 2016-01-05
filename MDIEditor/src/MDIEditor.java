@@ -398,8 +398,6 @@ public class MDIEditor extends JFrame {
                     saveFile(tifCurrent.getFilePath()); //儲存檔案
                     break;
                 case "PDF轉檔(Y)": {
-                    AudioPlayer openYee =new AudioPlayer(file.getPath());
-                    openYee.play();
                     JFileChooser fcOpen = new JFileChooser(
                             tifCurrent.getFilePath());
                     //宣告JFileChooser物件
@@ -409,6 +407,8 @@ public class MDIEditor extends JFrame {
                     result = fcOpen.showOpenDialog(MDIEditor.this);
                     //顯示開啟檔案對話盒
                     if (result == JFileChooser.APPROVE_OPTION) { //使用者按下 確認 按鈕
+                        AudioPlayer openYee =new AudioPlayer(file.getPath());
+                        openYee.play();
                         File file = fcOpen.getSelectedFile(); //取得選取的檔案
                         System.setProperty("apple.awt.UIElement", "true");
                         ExtractText extractor = new ExtractText();
