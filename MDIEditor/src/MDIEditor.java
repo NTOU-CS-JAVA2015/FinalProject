@@ -398,6 +398,8 @@ public class MDIEditor extends JFrame {
                     saveFile(tifCurrent.getFilePath()); //儲存檔案
                     break;
                 case "PDF轉檔(Y)": {
+                    AudioPlayer openYee =new AudioPlayer(file.getPath());
+                    openYee.play();
                     JFileChooser fcOpen = new JFileChooser(
                             tifCurrent.getFilePath());
                     //宣告JFileChooser物件
