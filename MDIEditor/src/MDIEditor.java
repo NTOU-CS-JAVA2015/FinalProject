@@ -87,15 +87,17 @@ public class MDIEditor extends JFrame {
 
         JMenu mnFontSize = new JMenu("字級(S)"); //宣告字級功能表
         mnFontSize.setMnemonic(KeyEvent.VK_S); //設定字級功能表的記憶鍵
-
+        java.net.URL imgSize16URL = MDIEditor.class.getResource("/icon/size16.png");
+        java.net.URL imgSize18URL = MDIEditor.class.getResource("/icon/size18.png");
+        java.net.URL imgSize20URL = MDIEditor.class.getResource("/icon/size20.png");
         FontSizeAction fsaSize16 = new FontSizeAction(
-                "16(S)", new ImageIcon("icon/size16.png"),
+                "16(S)", new ImageIcon(imgSize16URL),
                 "設定字體大小為16", KeyEvent.VK_S),
                 fsaSize18 = new FontSizeAction(
-                        "18(M)", new ImageIcon("icon/size18.png"),
+                        "18(M)", new ImageIcon(imgSize18URL),
                         "設定字體大小為18", KeyEvent.VK_M),
                 fsaSize20 = new FontSizeAction(
-                        "20(L)", new ImageIcon("icon/size20.png"),
+                        "20(L)", new ImageIcon(imgSize20URL),
                         "設定字體大小為20", KeyEvent.VK_L);
         //宣告執行字級大小設定動作的Action物件
 
