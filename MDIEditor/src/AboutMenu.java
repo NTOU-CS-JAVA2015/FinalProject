@@ -5,16 +5,6 @@ import java.io.IOException;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author yuhang
- */
 public class AboutMenu {
     AboutMenu(JMenu mnAbout){
                 JMenuItem miIntroduce = new JMenuItem("Team Member"),
