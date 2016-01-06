@@ -10,7 +10,14 @@ import javax.swing.filechooser.FileFilter;
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*; //引用處理事件的event套件
+import java.util.Map;
+import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javazoom.jl.decoder.JavaLayerException;
+import javazoom.spi.mpeg.sampled.file.MpegAudioFileReader;
 
 public class MDIEditor extends JFrame {
 
@@ -131,7 +138,7 @@ public class MDIEditor extends JFrame {
         bgSize.add(cbmiSize18);
         bgSize.add(cbmiSize20);
 
-        JMenu mnMusic = new JMenu("音樂(M)"); //宣告關於
+        JMenu mnMusic = new JMenu("音樂(M)"); //宣告音樂
         mnMusic.setMnemonic(KeyEvent.VK_M); //設定檔案功能表使用的記憶鍵
 
         JMenuItem miOpenMusic = new JMenuItem("開啟音樂檔(O)", KeyEvent.VK_O),
@@ -498,12 +505,13 @@ public class MDIEditor extends JFrame {
                         if (strCmp.equals("mp3") || strCmp.equals("MP3") || strCmp.equals("Mp3") || strCmp.equals("mP3")) {
                             mp3 = true;
                             try {
-                                while (loop) {
-                                    FileInputStream fis = new FileInputStream(file.getPath());
-                                    player = new PlayMP3(fis);
-                                    player.play();
-                                }
-                            } catch (FileNotFoundException | JavaLayerException ex) {
+                                AudioFileFormat baseFileFormat = new MpegAudioFileReader().getAudioFileFormat(file);
+                                Map properties = baseFileFormat.properties();
+                                long duration = (long) properties.get("duration");//mp3長度
+                                FileInputStream fis = new FileInputStream(file.getPath());
+                                player=new PlayMP3(fis,duration);
+                                player.play();
+                            } catch (UnsupportedAudioFileException | IOException | JavaLayerException ex) {
                                 System.out.println(ex.toString());
                             }
                         } else {
@@ -540,8 +548,6 @@ public class MDIEditor extends JFrame {
             case "停止(T)":
                 if (musicFlag) {
                     if (mp3) {
-                        player.stop();
-                        player.close();
                     } else {
                         audio.close();
                     }

@@ -1,4 +1,5 @@
 
+
 import java.io.InputStream;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
@@ -9,6 +10,8 @@ public class PlayMP3 {
     private final static int PLAYING = 1;
     private final static int PAUSED = 2;
     private final static int FINISHED = 3;
+    private final long duration;
+
 
     // the player actually doing all the work
     private final Player player;
@@ -19,9 +22,9 @@ public class PlayMP3 {
     // status variable what player thread is doing/supposed to do
     private int playerStatus = NOTSTARTED;
 
-
-    public PlayMP3(final InputStream inputStream) throws JavaLayerException {
+    public PlayMP3(final InputStream inputStream,long duration) throws JavaLayerException {
         this.player = new Player(inputStream);
+        this.duration = duration;
     }
 
     /**
@@ -33,7 +36,15 @@ public class PlayMP3 {
         synchronized (playerLock) {
             switch (playerStatus) {
                 case NOTSTARTED:
-                    final Runnable r = this::playInternal;
+                    final Runnable r = new Runnable() {
+                        public void run() {
+                            playInternal();
+                            System.out.println("789");
+                            playerStatus = PLAYING;
+                            playInternal();
+                            System.out.println("0000");
+                        }
+                    };
                     final Thread t = new Thread(r);
                     t.setDaemon(true);
                     t.setPriority(Thread.MAX_PRIORITY);
@@ -85,7 +96,9 @@ public class PlayMP3 {
     }
 
     private void playInternal() {
+        System.out.println("123");
         while (playerStatus != FINISHED) {
+            System.out.println("456");
             try {
                 if (!player.play(1)) {
                     break;
@@ -120,10 +133,6 @@ public class PlayMP3 {
         } catch (final Exception e) {
             // ignore, we are terminating anyway
         }
-    }
-
-    public boolean isComplete() {
-        return player.isComplete();
     }
 
 }
