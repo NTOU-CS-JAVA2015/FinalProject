@@ -1,9 +1,8 @@
 # FinalProject
 
-=========
-COMPLETED
+# `**COMPLETED**` #
 # `**2016/1/6**` #
-=========
+
 
 ========================
 BUILD OUTPUT DESCRIPTION
