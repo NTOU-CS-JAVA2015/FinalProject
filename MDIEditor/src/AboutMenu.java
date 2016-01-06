@@ -4,10 +4,12 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 
 public class AboutMenu {
-    AboutMenu(JMenu mnAbout){
-                JMenuItem miIntroduce = new JMenuItem("Team Member"),
+
+    AboutMenu(JMenu mnAbout) {
+        JMenuItem miIntroduce = new JMenuItem("Team Project"),
                 miNatLee = new JMenuItem("00181034 李映澤"),
                 miYuHang = new JMenuItem("00257122 張語航"),
                 miFinianrry = new JMenuItem("00257138 吳彥澄"),
@@ -22,17 +24,21 @@ public class AboutMenu {
 
         mnAbout.add(miIntroduce);
         mnAbout.addSeparator();
+        mnAbout.addSeparator();
         mnAbout.add(miNatLee);
         mnAbout.add(miYuHang);
         mnAbout.add(miFinianrry);
         mnAbout.add(miTommy);
         mnAbout.add(miVic);
     }
-    
-        ActionListener about = (ActionEvent e) -> {
+
+    ActionListener about = (ActionEvent e) -> {
         try {
             String url = "";
             switch (e.getActionCommand()) {
+                case "Team Project":
+                    url = "https://github.com/NTOU-CS-JAVA2015/FinalProject";
+                    break;
                 case "00181034 李映澤":
                     url = "https://github.com/NatLee";
                     break;
