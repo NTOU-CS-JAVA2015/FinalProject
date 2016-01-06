@@ -22,6 +22,15 @@ import javax.swing.filechooser.FileFilter;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.spi.mpeg.sampled.file.MpegAudioFileReader;
 
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+/**
+ *
+ * @author yuhang
+ */
 public class MusicMenu {
 
     boolean musicFlag = false;//判斷是否開啟過音樂
@@ -34,10 +43,10 @@ public class MusicMenu {
     PlayMP3 player = null;
     AudioPlayer audio = null;//音樂控制項
 
-    MusicMenu(JMenu mnMusic, JDesktopPane dpPanein, TextInternalFrame tifCurrentin, MDIEditor MDIEditorin) {
+    MusicMenu(JMenu mnMusic, MDIEditor MDIEditorin) {
         MDIEditor = MDIEditorin;
-        dpPane = dpPanein;
-        tifCurrent = tifCurrentin;
+        dpPane = MDIEditorin.dpPane;
+        tifCurrent = MDIEditorin.fontSize.tifCurrent;
         JMenuItem miOpenMusic = new JMenuItem("開啟音樂檔(O)", KeyEvent.VK_O),
                 miPause = new JMenuItem("暫停(P)", KeyEvent.VK_P),
                 miContinue = new JMenuItem("繼續(K)", KeyEvent.VK_K),
@@ -143,9 +152,9 @@ public class MusicMenu {
                 break;
             case "停止(T)":
                 if (musicFlag) {
+                    scheduler.shutdownNow();
+                    player.stop();
                     if (mp3) {
-                        scheduler.shutdownNow();
-                        player.stop();
                     } else {
                         audio.close();
                     }
