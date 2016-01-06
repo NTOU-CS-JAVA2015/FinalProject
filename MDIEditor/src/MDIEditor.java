@@ -10,16 +10,6 @@ import javax.swing.filechooser.FileFilter;
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*; //引用處理事件的event套件
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import javax.sound.sampled.AudioFileFormat;
-
-import javax.sound.sampled.UnsupportedAudioFileException;
-import javazoom.jl.decoder.JavaLayerException;
-import javazoom.spi.mpeg.sampled.file.MpegAudioFileReader;
 
 public class MDIEditor extends JFrame {
 
@@ -30,25 +20,18 @@ public class MDIEditor extends JFrame {
     //控制內部視窗畫面切換的功能表
 
     JMenuItem miCut, miCopy, miPaste; //執行編輯動作的功能表選項
-    JCheckBoxMenuItem cbmiSize16, cbmiSize18, cbmiSize20;
-    //控制字級大小的核取方塊選項
-
-    JToggleButton tbnSize16, tbnSize18, tbnSize20;
-    //控制字級大小的工具列按鈕
-
+    JCheckBoxMenuItem cbmiSize16, cbmiSize18, cbmiSize20;//控制字級大小的核取方塊選項
+    JToggleButton tbnSize16, tbnSize18, tbnSize20;//控制字級大小的工具列按鈕
+    JToolBar tbFontSize;
     JLabel lbStatus; //顯示游標位置與選取字元的標籤
     Action acCut, acCopy, acPaste; //執行編輯動作的Action物件
 
     AudioPlayer openYee = new AudioPlayer();//轉檔音效控制項
     java.net.URL Yee = MDIEditor.class.getResource("/voice/Yee.aiff");//取得Yee.aiff的URL
 
-    //AudioPlayer audio = null;//音樂控制項
     PlayMP3 player = null;
-    // boolean musicFlag = false;//判斷是否開啟過音樂
-    //ScheduledExecutorService scheduler;
-    //boolean scheduling = false;//判斷是否排程
+
     boolean loop = true;//無窮迴圈
-    // boolean mp3 = false;//判斷為mp3檔
 
     MDIEditor(String title) {
         super(title);//設定視窗名稱
@@ -108,39 +91,7 @@ public class MDIEditor extends JFrame {
 
         JMenu mnFontSize = new JMenu("字級(S)"); //宣告字級功能表
         mnFontSize.setMnemonic(KeyEvent.VK_S); //設定字級功能表的記憶鍵
-        java.net.URL imgSize16URL = MDIEditor.class.getResource("/icon/size16.png");
-        java.net.URL imgSize18URL = MDIEditor.class.getResource("/icon/size18.png");
-        java.net.URL imgSize20URL = MDIEditor.class.getResource("/icon/size20.png");
-        FontSizeAction fsaSize16 = new FontSizeAction(
-                "16(S)", new ImageIcon(imgSize16URL),
-                "設定字體大小為16", KeyEvent.VK_S),
-                fsaSize18 = new FontSizeAction(
-                        "18(M)", new ImageIcon(imgSize18URL),
-                        "設定字體大小為18", KeyEvent.VK_M),
-                fsaSize20 = new FontSizeAction(
-                        "20(L)", new ImageIcon(imgSize20URL),
-                        "設定字體大小為20", KeyEvent.VK_L);
-        //宣告執行字級大小設定動作的Action物件
-
-        cbmiSize16 = new JCheckBoxMenuItem(fsaSize16);
-        cbmiSize18 = new JCheckBoxMenuItem(fsaSize18);
-        cbmiSize20 = new JCheckBoxMenuItem(fsaSize20);
-        //以執行字級大小設定之Action物件建立核取方塊選項
-
-        cbmiSize16.setIcon(null); //設定核取方塊選項不使用圖示
-        cbmiSize18.setIcon(null);
-        cbmiSize20.setIcon(null);
-
-        cbmiSize16.setState(true); //設定選取代表16字級的核取方塊選項
-
-        mnFontSize.add(cbmiSize16); //將核取方塊選項加入功能表
-        mnFontSize.add(cbmiSize18);
-        mnFontSize.add(cbmiSize20);
-
-        ButtonGroup bgSize = new ButtonGroup(); //宣告按鈕群組
-        bgSize.add(cbmiSize16); //將核取方塊選項加入按鈕群組
-        bgSize.add(cbmiSize18);
-        bgSize.add(cbmiSize20);
+        new FontSize(mnFontSize,MDIEditor.this);
 
         JMenu mnMusic = new JMenu("音樂(M)"); //宣告音樂
         mnMusic.setMnemonic(KeyEvent.VK_M); //設定檔案功能表使用的記憶鍵
@@ -159,32 +110,10 @@ public class MDIEditor extends JFrame {
         jmb.add(mnMusic);
         jmb.add(mnAbout);
 
-        JToolBar tbFontSize = new JToolBar(); //新增工具列
-
-        tbnSize16 = new JToggleButton(fsaSize16);
-        tbnSize18 = new JToggleButton(fsaSize18);
-        tbnSize20 = new JToggleButton(fsaSize20);
-        //以執行字級大小設定的Action物件, 宣告工具列的JToggleButton按鈕
-
+        tbFontSize = new JToolBar(); //新增工具列
         tbFontSize.add(tbnSize16); //將JToggleButton按鈕加入工具列
         tbFontSize.add(tbnSize18);
         tbFontSize.add(tbnSize20);
-
-        tbnSize16.setActionCommand("16(S)");
-        tbnSize18.setActionCommand("18(M)");
-        tbnSize20.setActionCommand("20(L)");
-        //因為按鈕不顯示字串,故必須設定動作命令字串, 以便於回應事件時判別
-
-        tbnSize16.setText(null); //設定JToggleButton按鈕不顯示字串
-        tbnSize18.setText(null);
-        tbnSize20.setText(null);
-
-        tbnSize16.setSelected(true);//設定選取代表16字級的JToggleButton按鈕
-
-        ButtonGroup bgToolBar = new ButtonGroup(); //宣告按鈕群組
-        bgToolBar.add(tbnSize16); //將JToggleButton按鈕加入按鈕群組
-        bgToolBar.add(tbnSize18);
-        bgToolBar.add(tbnSize20);
 
         JPanel plStatus = new JPanel(new GridLayout(1, 1)); //宣告做為狀態列的JPanel
         lbStatus = new JLabel("游標位置 : 第 0 個字元"); //宣告顯示訊息的標籤
@@ -325,41 +254,6 @@ public class MDIEditor extends JFrame {
             }
         }
         return null;
-    }
-
-    //定義執行文字字級設定的Action物件
-    class FontSizeAction extends AbstractAction {
-
-        public FontSizeAction(String text, ImageIcon icon,
-                String desc, Integer mnemonic) {
-            super(text, icon); //呼叫基礎類別建構子
-            putValue(SHORT_DESCRIPTION, desc); //設定提示字串
-            putValue(MNEMONIC_KEY, mnemonic); //設定記憶鍵
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) { //回應事件的執行動作
-            //依照動作命令字串判別欲執行的動作
-            switch (e.getActionCommand()) {
-                case "20(L)":
-                    tifCurrent.setFontSize(20);
-                    //設定文字編輯面版使用20級字
-                    cbmiSize20.setSelected(true); //設定對應的控制項為選取
-                    tbnSize20.setSelected(true);
-                    break;
-                case "18(M)":
-                    tifCurrent.setFontSize(18);
-                    cbmiSize18.setSelected(true);
-                    tbnSize18.setSelected(true);
-                    break;
-                default:
-                    //預設16級字
-                    tifCurrent.setFontSize(16);
-                    cbmiSize16.setSelected(true);
-                    tbnSize16.setSelected(true);
-                    break;
-            }
-        }
     }
 
     //定義並宣告回應檔案功能表內選項被選取所觸發事件的監聽器
