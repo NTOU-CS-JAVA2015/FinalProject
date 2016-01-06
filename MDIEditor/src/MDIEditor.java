@@ -164,26 +164,7 @@ public class MDIEditor extends JFrame {
 
         JMenu mnAbout = new JMenu("關於(R)"); //宣告關於
         mnAbout.setMnemonic(KeyEvent.VK_R); //設定檔案功能表使用的記憶鍵
-        JMenuItem miIntroduce = new JMenuItem("Team Member"),
-                miNatLee = new JMenuItem("00181034 李映澤"),
-                miYuHang = new JMenuItem("00257122 張語航"),
-                miFinianrry = new JMenuItem("00257138 吳彥澄"),
-                miTommy = new JMenuItem("00257141 陳平揚"),
-                miVic = new JMenuItem("00257148 陳威任");
-
-        miNatLee.addActionListener(about);
-        miYuHang.addActionListener(about);
-        miFinianrry.addActionListener(about);
-        miTommy.addActionListener(about);
-        miVic.addActionListener(about);
-
-        mnAbout.add(miIntroduce);
-        mnAbout.addSeparator();
-        mnAbout.add(miNatLee);
-        mnAbout.add(miYuHang);
-        mnAbout.add(miFinianrry);
-        mnAbout.add(miTommy);
-        mnAbout.add(miVic);
+        AboutMenu aboutMenu = new AboutMenu(mnAbout);
 
         JMenuBar jmb = new JMenuBar(); //宣告功能表列物件
         setJMenuBar(jmb); //設定視窗框架使用的功能表列
@@ -585,31 +566,6 @@ public class MDIEditor extends JFrame {
         }
     };
 
-    ActionListener about = (ActionEvent e) -> {
-        try {
-            String url = "";
-            switch (e.getActionCommand()) {
-                case "00181034 李映澤":
-                    url = "https://github.com/NatLee";
-                    break;
-                case "00257122 張語航":
-                    url = "https://github.com/changyuhang";
-                    break;
-                case "00257138 吳彥澄":
-                    url = "https://github.com/FinianWu";
-                    break;
-                case "00257141 陳平揚":
-                    url = "https://github.com/ethanhunt0707";
-                    break;
-                case "00257148 陳威任":
-                    url = "https://github.com/vic4113110631";
-                    break;
-            }
-            Runtime.getRuntime().exec("cmd /c start " + url);
-        } catch (IOException ioe) {
-            System.err.println(ioe.toString());
-        }
-    };
 
     private void saveFile(String strPath) //儲存檔案
             throws IOException, BadLocationException {
