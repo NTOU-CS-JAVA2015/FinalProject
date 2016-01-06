@@ -26,12 +26,11 @@ public class MDIEditor extends JFrame {
     java.net.URL Yee = MDIEditor.class.getResource("/voice/Yee.aiff");//取得Yee.aiff的URL
 
     PlayMP3 player = null;
-
     boolean loop = true;//無窮迴圈
-    
+
     Editor fontSize;
     Action acCut, acCopy, acPaste; //執行編輯動作的Action物件
-    
+
     MDIEditor(String title) {
         super(title);//設定視窗名稱
         JMenu mnFontSize = new JMenu("字級(S)"); //宣告字級功能表
@@ -113,7 +112,7 @@ public class MDIEditor extends JFrame {
 
         JPanel plStatus = new JPanel(new GridLayout(1, 1)); //宣告做為狀態列的JPanel
         lbStatus = new JLabel("游標位置 : 第 0 個字元"); //宣告顯示訊息的標籤
-        plStatus.add(lbStatus);	//將標籤加入JPanel容器		
+        plStatus.add(lbStatus);	//將標籤加入JPanel容器
 
         Container cp = getContentPane(); //取得內容面版
         cp.add(tbFontSize, BorderLayout.NORTH); //將工具列加入內容面版
@@ -128,17 +127,23 @@ public class MDIEditor extends JFrame {
         setVisible(true);
     }
 
+
+
+
     //傳出用於容納內部框架的虛擬桌面
     public JDesktopPane getDesktopPane() {
         return dpPane;
     }
 
+
+
+
     //運用Action物件的名稱, 取得文字編輯面版提供的Action物件
     private Action getActionByName(String name) {
 
+
         Action[] actionsArray = fontSize.tifCurrent.getTextPane().getActions();
         //取得文字編輯面版提供的Action物件
-
         for (Action elm : actionsArray) {
             //運用比對名稱的方式, 取得Action物件的
             if (elm.getValue(Action.NAME).equals(name)) {
@@ -148,94 +153,103 @@ public class MDIEditor extends JFrame {
         return null;
     }
 
+
+
+
     //定義並宣告回應檔案功能表內選項被選取所觸發事件的監聽器
     ActionListener alFile = (ActionEvent e) -> {
         int result;
-        try {
-            //執行檔案開啟動作
+        try {     //執行檔案開啟動作
             switch (e.getActionCommand()) {
                 case "開啟舊檔(O)": {
-                    JFileChooser fcOpen = new JFileChooser(
-                            fontSize.tifCurrent.getFilePath());
-                    //宣告JFileChooser物件
+                    JFileChooser fcOpen = new JFileChooser(fontSize.tifCurrent.getFilePath());//宣告JFileChooser物件
+
                     FileFilter fileFilter = NewFileFilter("TXT File", new String[]{"txt"});
-                    fcOpen.addChoosableFileFilter(fileFilter);
-                    //設定篩選檔案的類型
-                    fcOpen.setDialogTitle("開啟舊檔"); //設定檔案選擇對話盒的標題
-                    result = fcOpen.showOpenDialog(MDIEditor.this);
-                    //顯示開啟檔案對話盒
-                    if (result == JFileChooser.APPROVE_OPTION) { //使用者按下 確認 按鈕
-                        File file = fcOpen.getSelectedFile(); //取得選取的檔案
-                        fontSize.createInternalFrame(file.getPath(), file.getName());
-                        //以取得的檔案建立TextInternalFrame物件
+                    fcOpen.addChoosableFileFilter(fileFilter);                        //設定篩選檔案的類型
+
+                    fcOpen.setDialogTitle("開啟舊檔");                                 //設定檔案選擇對話盒的標題
+                    result = fcOpen.showOpenDialog(MDIEditor.this);                   //顯示開啟檔案對話盒
+
+                    if (result == JFileChooser.APPROVE_OPTION) {                      //使用者按下 確認 按鈕
+                        File file = fcOpen.getSelectedFile();                         //取得選取的檔案
+                        fontSize.createInternalFrame(file.getPath(), file.getName()); //以取得的檔案建立TextInternalFrame物件
                     }
                     break;
                 }
-                case "新增(N)":
-                    //新增文件
-                    fontSize.createInternalFrame(); //建立沒有內容的TextInternalFrame物件
+
+                case "新增(N)":                     //新增文件
+                    fontSize.createInternalFrame();                         //建立沒有內容的TextInternalFrame物件
                     break;
-                case "儲存檔案(S)":
-                    //執行儲存檔案動作
-                    String strPath = fontSize.tifCurrent.getFilePath();
-                    //取得目前TextInternalFrame物件開啟檔案的路徑與名稱
-                    if (!fontSize.tifCurrent.isNew()) {
-                        //判斷TextInternalFrame物件開啟的是否為新的檔案
-                        FileWriter fw = new FileWriter(strPath);
-                        //建立輸出檔案的FileWriter物件
+
+                case "儲存檔案(S)":                 //執行儲存檔案動作
+                    String strPath = fontSize.tifCurrent.getFilePath();     //取得目前TextInternalFrame物件開啟檔案的路徑與名稱
+                    if (!fontSize.tifCurrent.isNew()) {                     //判斷TextInternalFrame物件開啟的是否為新的檔案
+                        FileWriter fw = new FileWriter(strPath);            //建立輸出檔案的FileWriter物件
                         fontSize.tifCurrent.write(fw);
                     } else {
-                        saveFile(strPath); //儲存檔案
+                        saveFile(strPath);         //存檔
                     }
                     break;
-                case "另存新檔(A)":
-                    saveFile(fontSize.tifCurrent.getFilePath()); //儲存檔案
+
+                case "另存新檔(A)":                                 //另存新檔
+                    saveFile(fontSize.tifCurrent.getFilePath());    //存檔
                     break;
+
                 case "PDF轉檔(Y)": {
-                    JFileChooser fcOpen = new JFileChooser(
-                            fontSize.tifCurrent.getFilePath());
-                    //宣告JFileChooser物件
+                    JFileChooser fcOpen = new JFileChooser(fontSize.tifCurrent.getFilePath());   //宣告JFileChooser物件
                     FileFilter fileFilter = NewFileFilter("PDF File", new String[]{"pdf"});
-                    fcOpen.addChoosableFileFilter(fileFilter);
-                    //設定篩選檔案的類型
-                    fcOpen.setDialogTitle("選擇要轉檔的PDF"); //設定檔案選擇對話盒的標題
-                    result = fcOpen.showOpenDialog(MDIEditor.this);
-                    //顯示開啟檔案對話盒
-                    if (result == JFileChooser.APPROVE_OPTION) { //使用者按下 確認 按鈕
-                        File file = fcOpen.getSelectedFile(); //取得選取的檔案
+
+                    fcOpen.addChoosableFileFilter(fileFilter);                 //設定篩選檔案的類型
+                    fcOpen.setDialogTitle("選擇要轉檔的PDF");                   //設定檔案選擇對話盒的標題
+
+                    result = fcOpen.showOpenDialog(MDIEditor.this);            //顯示開啟檔案對話盒
+
+                    if (result == JFileChooser.APPROVE_OPTION) {               //使用者按下 確認 按鈕
+
+                        File file = fcOpen.getSelectedFile();                  //取得選取的檔案
+
                         try {
-                            openYee.loadAudio(Yee);//載入yee
-                        } catch (Exception YeeException) {
+                            openYee.loadAudio(Yee);                            //載入yee
+                        }
+                        catch (Exception YeeException) {
                             System.out.println(YeeException.toString());
                         }
-                        openYee.play();
+
+                        openYee.play();                                        //播放yee
+
                         System.setProperty("apple.awt.UIElement", "true");
                         ExtractText extractor = new ExtractText();
                         String fi[] = {file.getPath()};
                         String fe, ff;
                         extractor.startExtraction(fi);
-                        fe = fi[0].substring(0, fi[0].length() - 3) + "txt";//去尾
-                        ff = file.getName().substring(0, file.getName().length() - 3) + "txt";//加上TXT
-                        fontSize.createInternalFrame(fe, ff);//以取得的檔案建立TextInternalFrame物件
+                        fe = fi[0].substring(0, fi[0].length() - 3) + "txt";                        //去尾
+                        ff = file.getName().substring(0, file.getName().length() - 3) + "txt";      //加上TXT
+                        fontSize.createInternalFrame(fe, ff);                                       //以取得的檔案建立TextInternalFrame物件
+
                     }
                     break;
                 }
                 case "結束(E)":
                     MDIEditor.this.processWindowEvent(
-                            new WindowEvent(MDIEditor.this,
-                                    WindowEvent.WINDOW_CLOSING));
-                    //執行WindowEvent事件, 觸發MDIEditor視窗框架的關閉視窗事件
+                            new WindowEvent(MDIEditor.this,WindowEvent.WINDOW_CLOSING));           //執行WindowEvent事件, 觸發MDIEditor視窗框架的關閉視窗事件
                     break;
             }
-        } catch (IOException ioe) {
+        }
+        catch (IOException ioe) {
             System.err.println(ioe.toString());
-        } catch (BadLocationException ble) {
+        }
+        catch (BadLocationException ble) {
             System.err.println("位置不正確");
         }
     };
 
+
+
+
+
+
     private void saveFile(String strPath) //儲存檔案
-            throws IOException, BadLocationException {
+      throws IOException, BadLocationException {
 
         int pos = strPath.lastIndexOf("\\");
 
@@ -245,25 +259,26 @@ public class MDIEditor extends JFrame {
         fcSave.setSelectedFile(new File(name)); //設定選取的檔案
 
         FileFilter fileFilter = NewFileFilter("TXT File", new String[]{"txt"});
-        fcSave.addChoosableFileFilter(fileFilter);
-        //設定篩選檔案的類型
+        fcSave.addChoosableFileFilter(fileFilter);//設定篩選檔案的類型
 
         fcSave.setDialogTitle("另存新檔"); //設定對話盒標題
 
-        int result = fcSave.showSaveDialog(MDIEditor.this);
-        //顯示檔案儲存對話盒
+        int result = fcSave.showSaveDialog(MDIEditor.this);//顯示檔案儲存對話盒
 
-        if (result == JFileChooser.APPROVE_OPTION) {
-            //使用者按下 確認 按鈕
+        if (result == JFileChooser.APPROVE_OPTION) {//使用者按下 確認 按鈕
 
             File file = fcSave.getSelectedFile(); //取得選取的檔案
-            fontSize.tifCurrent.write(new FileWriter(file));
-            //將文字編輯內部框架的內容輸出至FileWriter物件
 
+            fontSize.tifCurrent.write(new FileWriter(file));//將文字編輯內部框架的內容輸出至FileWriter物件
             fontSize.tifCurrent.setFileName(file.getName()); //設定編輯檔案名稱
             fontSize.tifCurrent.setFilePath(file.getPath()); //設定編輯檔案路徑
         }
     }
+
+
+
+
+
 
     //建立過濾檔案選擇對話盒內檔案類型的物件
     public FileFilter NewFileFilter(final String desc, final String[] allowed_extensions) {
@@ -276,7 +291,8 @@ public class MDIEditor extends JFrame {
                 int pos = f.getName().lastIndexOf('.');//尋找檔案名稱內的"."號
                 if (pos == -1) {
                     return false;
-                } else {
+                }
+                else {
                     String extension = f.getName().substring(pos + 1);//取得檔案名稱
                     for (String allowed_extension : allowed_extensions) {//從檔案名稱內取得副檔名字
                         if (extension.equalsIgnoreCase(allowed_extension)) {//判斷副檔名是否與檔案篩選物件的extension字串相同
@@ -295,53 +311,47 @@ public class MDIEditor extends JFrame {
         };
     }
 
+
+
+
+
+
     //在關閉應用程式前, 運用監聽器判別程式內開啟的檔案是否已經儲存
     WindowAdapter wa = new WindowAdapter() {
-
         //回應視窗關閉事件的方法
         @Override
         public void windowClosing(WindowEvent e) {
 
-            JInternalFrame[] ifAll = getDesktopPane().getAllFrames();
-            //取得目前虛擬桌面內所有開啟的TextInternalFrame物件
+            JInternalFrame[] ifAll = getDesktopPane().getAllFrames();            //取得目前虛擬桌面內所有開啟的TextInternalFrame物件
+            TextInternalFrame tifCurrent  = (TextInternalFrame) getDesktopPane().getSelectedFrame();//取得虛擬桌面目前選取的TextInternalFrame物件
 
-            TextInternalFrame tifCurrent
-                    = (TextInternalFrame) getDesktopPane().getSelectedFrame();
-            //取得虛擬桌面目前選取的TextInternalFrame物件
-
-            //判斷開啟的TextInternalFrame物件是否為0
-            if (ifAll.length != 0) {
-
-                //運用加強型for迴圈取得虛擬桌面內所有TextInternalFrame物件
-                for (JInternalFrame elm : ifAll) {
+            if (ifAll.length != 0) {                //判斷開啟的TextInternalFrame物件是否為0
+                for (JInternalFrame elm : ifAll) {  //運用加強型for迴圈取得虛擬桌面內所有TextInternalFrame物件
                     try {
                         if (!((TextInternalFrame) elm).isChanged()) {
                             elm.setClosed(true); //關閉內部框架
-                        } else {
+                        }
+                        else {
                             int result
-                                    = JOptionPane.showConfirmDialog(
-                                            MDIEditor.this, "是否儲存?",
-                                            "訊息", JOptionPane.YES_NO_CANCEL_OPTION,
-                                            JOptionPane.INFORMATION_MESSAGE);
-                            //顯示確認方塊
+                                    = JOptionPane.showConfirmDialog(MDIEditor.this, "是否儲存?", "訊息", JOptionPane.YES_NO_CANCEL_OPTION,  JOptionPane.INFORMATION_MESSAGE);//顯示確認方塊
 
-                            if (result == JOptionPane.NO_OPTION) //判斷是否按下 否 按鈕
-                            {
+                            if (result == JOptionPane.NO_OPTION){               //判斷是否按下 否 按鈕
                                 elm.setClosed(true);
-                            } else if (result == JOptionPane.CANCEL_OPTION) //判斷是否按下 取消 按鈕
-                            {
+                            }
+                            else if (result == JOptionPane.CANCEL_OPTION){      //判斷是否按下 取消 按鈕
                                 return;
-                            } else if (result == JOptionPane.YES_OPTION) {  //判斷是否按下 是 按鈕
-                                String strPath = ((TextInternalFrame) elm).getFilePath();
-                                //取得TextInternalFrame目前編輯檔案的路徑
-                                //判斷TextInternalFrame目前編輯檔案是否為新的
-                                if (!fontSize.tifCurrent.isNew()) {
-                                    fontSize.tifCurrent.write(new FileWriter(strPath));
-                                    //將TextInternalFrame的內容寫入FileWriter物件
-                                } else {
-                                    saveFile(strPath); //儲存檔案
+                            }
+                            else if (result == JOptionPane.YES_OPTION) {        //判斷是否按下 是 按鈕
+
+                                String strPath = ((TextInternalFrame) elm).getFilePath();//取得TextInternalFrame目前編輯檔案的路徑
+
+                                if (!fontSize.tifCurrent.isNew()) {             //判斷TextInternalFrame目前編輯檔案是否為新的
+                                    fontSize.tifCurrent.write(new FileWriter(strPath));//將TextInternalFrame的內容寫入FileWriter物件
                                 }
-                                elm.setClosed(true); //關閉內部框架
+                                else {
+                                    saveFile(strPath);  //儲存檔案
+                                }
+                                elm.setClosed(true);    //關閉內部框架
                             }
                         }
                     } catch (java.beans.PropertyVetoException pve) {
@@ -353,16 +363,15 @@ public class MDIEditor extends JFrame {
                     }
                 }
             }
+            ifAll = getDesktopPane().getAllFrames();    //取得虛擬桌面目前開啟的所有內部框架
 
-            ifAll = getDesktopPane().getAllFrames();
-            //取得虛擬桌面目前開啟的所有內部框架
-
-            if (ifAll.length == 0) //判斷內部框架的數目
-            {
-                System.exit(0); //結束應用程式
+            if (ifAll.length == 0){                      //判斷內部框架的數目
+                System.exit(0);                         //結束應用程式
             }
         }
     };
+
+
 
 
 }
