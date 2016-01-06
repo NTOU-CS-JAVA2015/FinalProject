@@ -11,10 +11,12 @@ import java.io.*;
 import java.awt.*;
 import java.awt.event.*; //引用處理事件的event套件
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import javax.sound.sampled.AudioFileFormat;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
+
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.spi.mpeg.sampled.file.MpegAudioFileReader;
@@ -43,6 +45,8 @@ public class MDIEditor extends JFrame {
     AudioPlayer audio = null;//音樂控制項
     PlayMP3 player = null;
     boolean musicFlag = false;//判斷是否開啟過音樂
+    ScheduledExecutorService scheduler;
+    boolean scheduling = false;//判斷是否排程
     boolean loop = true;//無窮迴圈
     boolean mp3 = false;//判斷為mp3檔
 
@@ -508,10 +512,27 @@ public class MDIEditor extends JFrame {
                                 AudioFileFormat baseFileFormat = new MpegAudioFileReader().getAudioFileFormat(file);
                                 Map properties = baseFileFormat.properties();
                                 long duration = (long) properties.get("duration");//mp3長度
-                                FileInputStream fis = new FileInputStream(file.getPath());
-                                player=new PlayMP3(fis,duration);
-                                player.play();
-                            } catch (UnsupportedAudioFileException | IOException | JavaLayerException ex) {
+
+                                scheduler = Executors.newSingleThreadScheduledExecutor();
+                                scheduling = true;
+                                final ScheduledFuture future = scheduler.scheduleAtFixedRate(new Runnable() {
+                                    //設定排程
+                                    @Override
+                                    public void run() {
+                                        // 排程工作
+                                        if (scheduling) {
+                                            try {
+                                                FileInputStream fis = new FileInputStream(file.getPath());
+                                                player = new PlayMP3(fis, duration);
+                                                player.play();
+                                            } catch (FileNotFoundException | JavaLayerException ex) {
+                                                System.out.println(ex.toString());
+                                            }
+                                        }
+                                    }
+                                }, 0, duration + 5000, TimeUnit.MICROSECONDS);//0微秒開始執行，每duration+5000微秒執行一次
+
+                            } catch (UnsupportedAudioFileException | IOException ex) {
                                 System.out.println(ex.toString());
                             }
                         } else {
@@ -526,6 +547,7 @@ public class MDIEditor extends JFrame {
             case "暫停(P)":
                 if (musicFlag) {
                     if (mp3) {
+                        scheduling = false;
                         player.pause();
                     } else {
                         audio.pause();
@@ -537,6 +559,7 @@ public class MDIEditor extends JFrame {
             case "繼續(K)":
                 if (musicFlag) {
                     if (mp3) {
+                        scheduling = true;
                         player.resume();
                     } else {
                         audio.resume();
@@ -547,6 +570,8 @@ public class MDIEditor extends JFrame {
                 break;
             case "停止(T)":
                 if (musicFlag) {
+                    scheduler.shutdownNow();
+                    player.stop();
                     if (mp3) {
                     } else {
                         audio.close();
@@ -619,19 +644,19 @@ public class MDIEditor extends JFrame {
 
     //建立過濾檔案選擇對話盒內檔案類型的物件
     private FileFilter NewFileFilter(final String desc, final String[] allowed_extensions) {
-        return new javax.swing.filechooser.FileFilter() {
+        return new FileFilter() {//建構子
             @Override
-            public boolean accept(java.io.File f) {
+            public boolean accept(File f) {//若為資料夾傳回true
                 if (f.isDirectory()) {
                     return true;
                 }
-                int pos = f.getName().lastIndexOf('.');
+                int pos = f.getName().lastIndexOf('.');//尋找檔案名稱內的"."號
                 if (pos == -1) {
                     return false;
                 } else {
-                    String extension = f.getName().substring(pos + 1);
-                    for (String allowed_extension : allowed_extensions) {
-                        if (extension.equalsIgnoreCase(allowed_extension)) {
+                    String extension = f.getName().substring(pos + 1);//取得檔案名稱
+                    for (String allowed_extension : allowed_extensions) {//從檔案名稱內取得副檔名字
+                        if (extension.equalsIgnoreCase(allowed_extension)) {//判斷副檔名是否與檔案篩選物件的extension字串相同
                             return true;
                         }
                     }
@@ -639,54 +664,14 @@ public class MDIEditor extends JFrame {
                 }
             }
 
+            //傳回檔案篩選物件欲篩選檔案類型的描述字串
             @Override
             public String getDescription() {
                 return desc;
             }
         };
     }
-    /*
-     //建立過濾檔案選擇對話盒內檔案類型的物件
-     class TxtFileFilter extends FileFilter {
 
-     String extension;
-
-     public TxtFileFilter(String ext) { //建構子
-     extension = ext;
-     }
-
-     @Override
-     public boolean accept(File f) {
-     if (f.isDirectory()) //若為資料夾傳回true
-     {
-     return true;
-     }
-
-     String ext = null;
-     String s = f.getName(); //取得檔案名稱
-     int i = s.lastIndexOf('.'); //尋找檔案名稱內的"."號
-
-     if (i > 0 && i < s.length() - 1) {
-     ext = s.substring(i + 1).toLowerCase();
-     //從檔案名稱內取得副檔名字
-
-     //判斷副檔名是否與檔案篩選物件的extension字串相同
-     if (ext.equals(extension)) {
-     return true;
-     }
-     }
-
-     return false;
-     }
-
-     //傳回檔案篩選物件欲篩選檔案類型的描述字串
-     @Override
-     public String getDescription() {
-     return "篩選所需要的檔案";
-     }
-     }
-     */
-    //定義並宣告回應WindowEvent事件的WindowAdapter類別,
     //在關閉應用程式前, 運用監聽器判別程式內開啟的檔案是否已經儲存
     WindowAdapter wa = new WindowAdapter() {
 
