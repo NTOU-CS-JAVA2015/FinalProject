@@ -10,6 +10,16 @@ import javax.swing.filechooser.FileFilter;
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*; //引用處理事件的event套件
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import javax.sound.sampled.AudioFileFormat;
+
+import javax.sound.sampled.UnsupportedAudioFileException;
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.spi.mpeg.sampled.file.MpegAudioFileReader;
 
 public class MDIEditor extends JFrame {
 
@@ -20,18 +30,25 @@ public class MDIEditor extends JFrame {
     //控制內部視窗畫面切換的功能表
 
     JMenuItem miCut, miCopy, miPaste; //執行編輯動作的功能表選項
-    JCheckBoxMenuItem cbmiSize16, cbmiSize18, cbmiSize20;//控制字級大小的核取方塊選項
-    JToggleButton tbnSize16, tbnSize18, tbnSize20;//控制字級大小的工具列按鈕
-    JToolBar tbFontSize;
+    JCheckBoxMenuItem cbmiSize16, cbmiSize18, cbmiSize20;
+    //控制字級大小的核取方塊選項
+
+    JToggleButton tbnSize16, tbnSize18, tbnSize20;
+    //控制字級大小的工具列按鈕
+
     JLabel lbStatus; //顯示游標位置與選取字元的標籤
     Action acCut, acCopy, acPaste; //執行編輯動作的Action物件
 
     AudioPlayer openYee = new AudioPlayer();//轉檔音效控制項
     java.net.URL Yee = MDIEditor.class.getResource("/voice/Yee.aiff");//取得Yee.aiff的URL
 
+    AudioPlayer audio = null;//音樂控制項
     PlayMP3 player = null;
-
+    boolean musicFlag = false;//判斷是否開啟過音樂
+    ScheduledExecutorService scheduler;
+    boolean scheduling = false;//判斷是否排程
     boolean loop = true;//無窮迴圈
+    boolean mp3 = false;//判斷為mp3檔
 
     MDIEditor(String title) {
         super(title);//設定視窗名稱
@@ -91,15 +108,83 @@ public class MDIEditor extends JFrame {
 
         JMenu mnFontSize = new JMenu("字級(S)"); //宣告字級功能表
         mnFontSize.setMnemonic(KeyEvent.VK_S); //設定字級功能表的記憶鍵
-        new FontSize(mnFontSize,MDIEditor.this);
+        java.net.URL imgSize16URL = MDIEditor.class.getResource("/icon/size16.png");
+        java.net.URL imgSize18URL = MDIEditor.class.getResource("/icon/size18.png");
+        java.net.URL imgSize20URL = MDIEditor.class.getResource("/icon/size20.png");
+        FontSizeAction fsaSize16 = new FontSizeAction(
+                "16(S)", new ImageIcon(imgSize16URL),
+                "設定字體大小為16", KeyEvent.VK_S),
+                fsaSize18 = new FontSizeAction(
+                        "18(M)", new ImageIcon(imgSize18URL),
+                        "設定字體大小為18", KeyEvent.VK_M),
+                fsaSize20 = new FontSizeAction(
+                        "20(L)", new ImageIcon(imgSize20URL),
+                        "設定字體大小為20", KeyEvent.VK_L);
+        //宣告執行字級大小設定動作的Action物件
+
+        cbmiSize16 = new JCheckBoxMenuItem(fsaSize16);
+        cbmiSize18 = new JCheckBoxMenuItem(fsaSize18);
+        cbmiSize20 = new JCheckBoxMenuItem(fsaSize20);
+        //以執行字級大小設定之Action物件建立核取方塊選項
+
+        cbmiSize16.setIcon(null); //設定核取方塊選項不使用圖示
+        cbmiSize18.setIcon(null);
+        cbmiSize20.setIcon(null);
+
+        cbmiSize16.setState(true); //設定選取代表16字級的核取方塊選項
+
+        mnFontSize.add(cbmiSize16); //將核取方塊選項加入功能表
+        mnFontSize.add(cbmiSize18);
+        mnFontSize.add(cbmiSize20);
+
+        ButtonGroup bgSize = new ButtonGroup(); //宣告按鈕群組
+        bgSize.add(cbmiSize16); //將核取方塊選項加入按鈕群組
+        bgSize.add(cbmiSize18);
+        bgSize.add(cbmiSize20);
 
         JMenu mnMusic = new JMenu("音樂(M)"); //宣告音樂
         mnMusic.setMnemonic(KeyEvent.VK_M); //設定檔案功能表使用的記憶鍵
-        MusicMenu musicMenu = new MusicMenu(mnMusic,dpPane,tifCurrent,MDIEditor.this);
+
+        JMenuItem miOpenMusic = new JMenuItem("開啟音樂檔(O)", KeyEvent.VK_O),
+                miPause = new JMenuItem("暫停(P)", KeyEvent.VK_P),
+                miContinue = new JMenuItem("繼續(K)", KeyEvent.VK_K),
+                miStop = new JMenuItem("停止(T)", KeyEvent.VK_T);
+
+        miOpenMusic.addActionListener(music); //為功能表選項加上監聽器
+        miPause.addActionListener(music);
+        miContinue.addActionListener(music);
+        miStop.addActionListener(music);
+
+        mnMusic.add(miOpenMusic); //將選項加入檔案功能表
+        mnMusic.addSeparator();
+        mnMusic.add(miPause);
+        mnMusic.add(miContinue);
+        mnMusic.addSeparator();
+        mnMusic.add(miStop);
 
         JMenu mnAbout = new JMenu("關於(R)"); //宣告關於
         mnAbout.setMnemonic(KeyEvent.VK_R); //設定檔案功能表使用的記憶鍵
-        AboutMenu aboutMenu = new AboutMenu(mnAbout);
+        JMenuItem miIntroduce = new JMenuItem("Team Member"),
+                miNatLee = new JMenuItem("00181034 李映澤"),
+                miYuHang = new JMenuItem("00257122 張語航"),
+                miFinianrry = new JMenuItem("00257138 吳彥澄"),
+                miTommy = new JMenuItem("00257141 陳平揚"),
+                miVic = new JMenuItem("00257148 陳威任");
+       
+        miNatLee.addActionListener(about);
+        miYuHang.addActionListener(about);
+        miFinianrry.addActionListener(about);
+        miTommy.addActionListener(about);
+        miVic.addActionListener(about);
+
+        
+        mnAbout.add(miIntroduce);
+        mnAbout.addSeparator();
+        mnAbout.add(miNatLee);
+        mnAbout.add(miYuHang);
+        mnAbout.add(miFinianrry);
+        mnAbout.add(miTommy);
+        mnAbout.add(miVic);
 
         JMenuBar jmb = new JMenuBar(); //宣告功能表列物件
         setJMenuBar(jmb); //設定視窗框架使用的功能表列
@@ -110,10 +195,32 @@ public class MDIEditor extends JFrame {
         jmb.add(mnMusic);
         jmb.add(mnAbout);
 
-        tbFontSize = new JToolBar(); //新增工具列
+        JToolBar tbFontSize = new JToolBar(); //新增工具列
+
+        tbnSize16 = new JToggleButton(fsaSize16);
+        tbnSize18 = new JToggleButton(fsaSize18);
+        tbnSize20 = new JToggleButton(fsaSize20);
+        //以執行字級大小設定的Action物件, 宣告工具列的JToggleButton按鈕
+
         tbFontSize.add(tbnSize16); //將JToggleButton按鈕加入工具列
         tbFontSize.add(tbnSize18);
         tbFontSize.add(tbnSize20);
+
+        tbnSize16.setActionCommand("16(S)");
+        tbnSize18.setActionCommand("18(M)");
+        tbnSize20.setActionCommand("20(L)");
+        //因為按鈕不顯示字串,故必須設定動作命令字串, 以便於回應事件時判別
+
+        tbnSize16.setText(null); //設定JToggleButton按鈕不顯示字串
+        tbnSize18.setText(null);
+        tbnSize20.setText(null);
+
+        tbnSize16.setSelected(true);//設定選取代表16字級的JToggleButton按鈕
+
+        ButtonGroup bgToolBar = new ButtonGroup(); //宣告按鈕群組
+        bgToolBar.add(tbnSize16); //將JToggleButton按鈕加入按鈕群組
+        bgToolBar.add(tbnSize18);
+        bgToolBar.add(tbnSize20);
 
         JPanel plStatus = new JPanel(new GridLayout(1, 1)); //宣告做為狀態列的JPanel
         lbStatus = new JLabel("游標位置 : 第 0 個字元"); //宣告顯示訊息的標籤
@@ -256,6 +363,41 @@ public class MDIEditor extends JFrame {
         return null;
     }
 
+    //定義執行文字字級設定的Action物件
+    class FontSizeAction extends AbstractAction {
+
+        public FontSizeAction(String text, ImageIcon icon,
+                String desc, Integer mnemonic) {
+            super(text, icon); //呼叫基礎類別建構子
+            putValue(SHORT_DESCRIPTION, desc); //設定提示字串
+            putValue(MNEMONIC_KEY, mnemonic); //設定記憶鍵
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) { //回應事件的執行動作
+            //依照動作命令字串判別欲執行的動作
+            switch (e.getActionCommand()) {
+                case "20(L)":
+                    tifCurrent.setFontSize(20);
+                    //設定文字編輯面版使用20級字
+                    cbmiSize20.setSelected(true); //設定對應的控制項為選取
+                    tbnSize20.setSelected(true);
+                    break;
+                case "18(M)":
+                    tifCurrent.setFontSize(18);
+                    cbmiSize18.setSelected(true);
+                    tbnSize18.setSelected(true);
+                    break;
+                default:
+                    //預設16級字
+                    tifCurrent.setFontSize(16);
+                    cbmiSize16.setSelected(true);
+                    tbnSize16.setSelected(true);
+                    break;
+            }
+        }
+    }
+
     //定義並宣告回應檔案功能表內選項被選取所觸發事件的監聽器
     ActionListener alFile = (ActionEvent e) -> {
         int result;
@@ -342,6 +484,138 @@ public class MDIEditor extends JFrame {
         }
     };
 
+    ActionListener music = (ActionEvent e) -> {
+        int result;
+        switch (e.getActionCommand()) {
+            case "開啟音樂檔(O)":
+                if (musicFlag) {
+                    JOptionPane.showMessageDialog(dpPane, "醒醒吧！你沒聽到聲音嗎？\n或許真的沒聽到？請停止播放再開檔！");
+                }
+                if (!musicFlag) {
+                    JFileChooser fcOpen = new JFileChooser(
+                            tifCurrent.getFilePath());
+                    //宣告JFileChooser物件
+                    FileFilter fileFilter = NewFileFilter("Media Files", new String[]{"mp3", "au", "aiff", "wav"});
+                    fcOpen.addChoosableFileFilter(fileFilter);
+                    //設定篩選檔案的類型
+                    fcOpen.setDialogTitle("開啟WAV檔"); //設定檔案選擇對話盒的標題
+                    result = fcOpen.showOpenDialog(MDIEditor.this);
+                    //顯示開啟檔案對話盒
+                    if (result == JFileChooser.APPROVE_OPTION) {
+                        //使用者按下 確認 按鈕
+                        musicFlag = true;
+                        mp3 = false;
+                        File file = fcOpen.getSelectedFile(); //取得選取的檔案
+                        String strCmp = file.getPath().substring(file.getPath().length() - 3, file.getPath().length());
+                        if (strCmp.equals("mp3") || strCmp.equals("MP3") || strCmp.equals("Mp3") || strCmp.equals("mP3")) {
+                            mp3 = true;
+                            try {
+                                AudioFileFormat baseFileFormat = new MpegAudioFileReader().getAudioFileFormat(file);
+                                Map properties = baseFileFormat.properties();
+                                long duration = (long) properties.get("duration");//mp3長度
+
+                                scheduler = Executors.newSingleThreadScheduledExecutor();
+                                scheduling = true;
+                                final ScheduledFuture future = scheduler.scheduleAtFixedRate(new Runnable() {
+                                    //設定排程
+                                    @Override
+                                    public void run() {
+                                        // 排程工作
+                                        if (scheduling) {
+                                            try {
+                                                FileInputStream fis = new FileInputStream(file.getPath());
+                                                player = new PlayMP3(fis, duration);
+                                                player.play();
+                                            } catch (FileNotFoundException | JavaLayerException ex) {
+                                                System.out.println(ex.toString());
+                                            }
+                                        }
+                                    }
+                                }, 0, duration + 5000, TimeUnit.MICROSECONDS);//0微秒開始執行，每duration+5000微秒執行一次
+
+                            } catch (UnsupportedAudioFileException | IOException ex) {
+                                System.out.println(ex.toString());
+                            }
+                        } else {
+                            audio = new AudioPlayer();
+                            audio.loadAudio(file.getPath());
+                            audio.setPlayCount(0);//0為持續播放
+                            audio.play();
+                        }
+                    }
+                }
+                break;
+            case "暫停(P)":
+                if (musicFlag) {
+                    if (mp3) {
+                        scheduling = false;
+                        player.pause();
+                    } else {
+                        audio.pause();
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(dpPane, "醒醒吧！你還沒開音樂！");
+                }
+                break;
+            case "繼續(K)":
+                if (musicFlag) {
+                    if (mp3) {
+                        scheduling = true;
+                        player.resume();
+                    } else {
+                        audio.resume();
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(dpPane, "醒醒吧！你還沒開音樂！");
+                }
+                break;
+            case "停止(T)":
+                if (musicFlag) {
+                    scheduler.shutdownNow();
+                    player.stop();
+                    if (mp3) {
+                    } else {
+                        audio.close();
+                    }
+                    JOptionPane.showMessageDialog(dpPane, "要再次播放請重新選擇音樂！");
+                    musicFlag = false;
+                } else {
+                    JOptionPane.showMessageDialog(dpPane, "醒醒吧！你還沒開音樂！");
+                }
+                break;
+        }
+    };
+
+    ActionListener about = (ActionEvent e) -> {
+            
+        try {
+            String url = "";
+            switch (e.getActionCommand()) {
+              switch  case "00181034 李映澤":
+                    url = "https://github.com/NatLee";
+                    break;
+                case "00257122 張語航":
+                    url = "https://github.com/changyuhang";
+                    break;
+                case "00257138 吳彥澄":
+                    url = "https://github.com/FinianWu";
+                    break;
+                case "00257141 陳平揚":
+                    url = "https://github.com/ethanhunt0707";
+                    break;
+                case "00257148 陳威任":
+                    url = "https://github.com/vic4113110631";
+                    break;
+                default:
+                    break;
+            }
+            JOptionPane.showMessageDialog(null,String.format("LINK to %s gitHub", e.getActionCommand()));
+            Runtime.getRuntime().exec("cmd /c start " + url);
+        } catch (IOException ioe) {
+            System.err.println(ioe.toString());
+        }
+    };
+    
     private void saveFile(String strPath) //儲存檔案
             throws IOException, BadLocationException {
 
@@ -374,7 +648,7 @@ public class MDIEditor extends JFrame {
     }
 
     //建立過濾檔案選擇對話盒內檔案類型的物件
-    public FileFilter NewFileFilter(final String desc, final String[] allowed_extensions) {
+    private FileFilter NewFileFilter(final String desc, final String[] allowed_extensions) {
         return new FileFilter() {//建構子
             @Override
             public boolean accept(File f) {//若為資料夾傳回true
