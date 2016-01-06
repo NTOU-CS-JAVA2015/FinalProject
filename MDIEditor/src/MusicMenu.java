@@ -22,15 +22,6 @@ import javax.swing.filechooser.FileFilter;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.spi.mpeg.sampled.file.MpegAudioFileReader;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-/**
- *
- * @author yuhang
- */
 public class MusicMenu {
 
     boolean musicFlag = false;//判斷是否開啟過音樂
@@ -105,7 +96,7 @@ public class MusicMenu {
                                         if (scheduling) {
                                             try {
                                                 FileInputStream fis = new FileInputStream(file.getPath());
-                                                player = new PlayMP3(fis, duration);
+                                                player = new PlayMP3(fis);
                                                 player.play();
                                             } catch (FileNotFoundException | JavaLayerException ex) {
                                                 System.out.println(ex.toString());
@@ -152,9 +143,9 @@ public class MusicMenu {
                 break;
             case "停止(T)":
                 if (musicFlag) {
-                    scheduler.shutdownNow();
-                    player.stop();
                     if (mp3) {
+                        scheduler.shutdownNow();
+                        player.stop();
                     } else {
                         audio.close();
                     }
