@@ -498,11 +498,9 @@ public class MDIEditor extends JFrame {
                         if (strCmp.equals("mp3") || strCmp.equals("MP3") || strCmp.equals("Mp3") || strCmp.equals("mP3")) {
                             mp3 = true;
                             try {
-                                while (loop) {
                                     FileInputStream fis = new FileInputStream(file.getPath());
                                     player = new PlayMP3(fis);
                                     player.play();
-                                }
                             } catch (FileNotFoundException | JavaLayerException ex) {
                                 System.out.println(ex.toString());
                             }
