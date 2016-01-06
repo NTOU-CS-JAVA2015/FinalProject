@@ -4,17 +4,13 @@
 
 import javax.swing.*;
 import javax.swing.text.*;
-import javax.swing.event.*;
 import javax.swing.filechooser.FileFilter;
-
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*; //引用處理事件的event套件
-
 public class MDIEditor extends JFrame {
 
     JDesktopPane dpPane = new JDesktopPane(); //容納內部框架的虛擬桌面
-    TextInternalFrame tifCurrent; //目前點選的文字編輯內部框架
 
     WindowMenu wmWindow = new WindowMenu("視窗(W)", KeyEvent.VK_W);
     //控制內部視窗畫面切換的功能表
@@ -24,7 +20,7 @@ public class MDIEditor extends JFrame {
     JToggleButton tbnSize16, tbnSize18, tbnSize20;//控制字級大小的工具列按鈕
     JToolBar tbFontSize;
     JLabel lbStatus; //顯示游標位置與選取字元的標籤
-    Action acCut, acCopy, acPaste; //執行編輯動作的Action物件
+
 
     AudioPlayer openYee = new AudioPlayer();//轉檔音效控制項
     java.net.URL Yee = MDIEditor.class.getResource("/voice/Yee.aiff");//取得Yee.aiff的URL
@@ -32,12 +28,16 @@ public class MDIEditor extends JFrame {
     PlayMP3 player = null;
 
     boolean loop = true;//無窮迴圈
-
+    
+    Editor fontSize;
+    Action acCut, acCopy, acPaste; //執行編輯動作的Action物件
+    
     MDIEditor(String title) {
         super(title);//設定視窗名稱
-        createInternalFrame(); //建立第一個內部框架
-
-        JTextPane tpCurrent = tifCurrent.getTextPane(); //取得內部框架使用的文字編輯面版
+        JMenu mnFontSize = new JMenu("字級(S)"); //宣告字級功能表
+        mnFontSize.setMnemonic(KeyEvent.VK_S); //設定字級功能表的記憶鍵
+        fontSize = new Editor(mnFontSize,MDIEditor.this,wmWindow);
+        fontSize.createInternalFrame(); //建立第一個內部框架
 
         JMenu mnFile = new JMenu("檔案(F)"); //宣告檔案功能表
         mnFile.setMnemonic(KeyEvent.VK_F); //設定檔案功能表使用的記憶鍵
@@ -89,13 +89,9 @@ public class MDIEditor extends JFrame {
         mnEdit.add(acCopy);
         mnEdit.add(acPaste);
 
-        JMenu mnFontSize = new JMenu("字級(S)"); //宣告字級功能表
-        mnFontSize.setMnemonic(KeyEvent.VK_S); //設定字級功能表的記憶鍵
-        new FontSize(mnFontSize,MDIEditor.this);
-
         JMenu mnMusic = new JMenu("音樂(M)"); //宣告音樂
         mnMusic.setMnemonic(KeyEvent.VK_M); //設定檔案功能表使用的記憶鍵
-        MusicMenu musicMenu = new MusicMenu(mnMusic,dpPane,tifCurrent,MDIEditor.this);
+        MusicMenu musicMenu = new MusicMenu(mnMusic,MDIEditor.this);
 
         JMenu mnAbout = new JMenu("關於(R)"); //宣告關於
         mnAbout.setMnemonic(KeyEvent.VK_R); //設定檔案功能表使用的記憶鍵
@@ -137,114 +133,10 @@ public class MDIEditor extends JFrame {
         return dpPane;
     }
 
-    //建立文字編輯內部框架
-    private void createInternalFrame(String... strArgs) {
-
-        //依照是否傳入參數決定呼叫的TextInternalFrame類別建構子
-        if (strArgs.length == 0) {
-            tifCurrent = new TextInternalFrame();
-        } else {
-            tifCurrent = new TextInternalFrame(strArgs[0], strArgs[1]);
-        }
-
-        tifCurrent.addCaretListener(cl);
-        //註冊回應游標CaretEvent事件的監聽器
-
-        tifCurrent.addInternalFrameListener(ifl);
-        //註冊回應InternalFrameEvent事件的監聽器
-
-        JCheckBoxMenuItem cbmiWindow = tifCurrent.getMenuItem();
-        //取得代表完成建立之TextInternalFrame物件的核取方塊選項
-
-        wmWindow.add(cbmiWindow, tifCurrent);
-        //將核取方塊選項與對應的TextInternalFrame物件新增至視窗功能表
-
-        dpPane.add(tifCurrent);
-        //將完成建立的TextInternalFrame物件加入虛擬桌面
-
-        int FrameCount = dpPane.getAllFrames().length;
-        //取得虛擬桌面內TextInternalFrame物件的個數
-
-        tifCurrent.setLocation(20 * (FrameCount - 1), 20 * (FrameCount - 1));
-        //設定TextInternalFrame物件所顯示文字編輯視窗框架左上角在虛擬桌面的座標
-
-        try {
-            tifCurrent.setSelected(true);
-            //設定選取完成建立的TextInternalFrame物件
-        } catch (java.beans.PropertyVetoException pve) {
-            System.out.println(pve.toString());
-        }
-    }
-
-    //定義並宣告回應InternalFrame事件的監聽器
-    InternalFrameAdapter ifl = new InternalFrameAdapter() {
-
-        //當內部框架取得游標焦點觸發事件將由此方法回應
-        @Override
-        public void internalFrameActivated(InternalFrameEvent e) {
-
-            tifCurrent = (TextInternalFrame) e.getInternalFrame();
-            //取得觸發InternalFrame事件的TextInternalFrame物件
-
-            tifCurrent.getMenuItem().setSelected(true);
-            //設定視窗功能表內代表此TextInternalFrame物件的核取方塊選項為選取
-
-            //取得TextInternalFrame物件顯示內容使用的字級大小
-            switch (tifCurrent.getFontSize()) {
-                case 16:
-                    cbmiSize16.setSelected(true); //設定對應的控制項為選取
-                    tbnSize16.setSelected(true);
-                    break;
-                case 18:
-                    cbmiSize18.setSelected(true);
-                    tbnSize18.setSelected(true);
-                    break;
-                case 20:
-                    cbmiSize20.setSelected(true);
-                    tbnSize20.setSelected(true);
-                    break;
-            }
-
-        }
-
-        //當內部框架正在關閉時所觸發事件將由此方法回應
-        @Override
-        public void internalFrameClosing(InternalFrameEvent e) {
-            wmWindow.remove(tifCurrent.getMenuItem());
-            //移除視窗功能表內代表目前執行編輯之TextInternalFrame物件的選項
-        }
-    };
-
-    //定義並宣告回應CaretEvent事件的監聽器
-    CaretListener cl = new CaretListener() {
-
-        //移動游標位置時, 將由此方法回應
-        @Override
-        public void caretUpdate(CaretEvent e) {
-
-            if (e.getDot() != e.getMark()) {
-                lbStatus.setText("目前位置 : 第 " + e.getDot()
-                        + " 個字元" + ", 選取範圍 : " + e.getDot() + "至" + e.getMark());
-                //設定狀態列內的文字
-
-                acCut.setEnabled(true);
-                acCopy.setEnabled(true);
-                //設定執行剪下與複製動字的Action元件為有效
-            } else {
-                lbStatus.setText("目前位置 : 第 " + e.getDot() + " 個字元");
-                //設定狀態列內的文字
-
-                acCut.setEnabled(false);
-                acCopy.setEnabled(false);
-                //設定執行剪下與複製動字的Action元件為無效
-            }
-        }
-    };
-
     //運用Action物件的名稱, 取得文字編輯面版提供的Action物件
     private Action getActionByName(String name) {
 
-        Action[] actionsArray = tifCurrent.getTextPane().getActions();
+        Action[] actionsArray = fontSize.tifCurrent.getTextPane().getActions();
         //取得文字編輯面版提供的Action物件
 
         for (Action elm : actionsArray) {
@@ -264,7 +156,7 @@ public class MDIEditor extends JFrame {
             switch (e.getActionCommand()) {
                 case "開啟舊檔(O)": {
                     JFileChooser fcOpen = new JFileChooser(
-                            tifCurrent.getFilePath());
+                            fontSize.tifCurrent.getFilePath());
                     //宣告JFileChooser物件
                     FileFilter fileFilter = NewFileFilter("TXT File", new String[]{"txt"});
                     fcOpen.addChoosableFileFilter(fileFilter);
@@ -274,34 +166,34 @@ public class MDIEditor extends JFrame {
                     //顯示開啟檔案對話盒
                     if (result == JFileChooser.APPROVE_OPTION) { //使用者按下 確認 按鈕
                         File file = fcOpen.getSelectedFile(); //取得選取的檔案
-                        createInternalFrame(file.getPath(), file.getName());
+                        fontSize.createInternalFrame(file.getPath(), file.getName());
                         //以取得的檔案建立TextInternalFrame物件
                     }
                     break;
                 }
                 case "新增(N)":
                     //新增文件
-                    createInternalFrame(); //建立沒有內容的TextInternalFrame物件
+                    fontSize.createInternalFrame(); //建立沒有內容的TextInternalFrame物件
                     break;
                 case "儲存檔案(S)":
                     //執行儲存檔案動作
-                    String strPath = tifCurrent.getFilePath();
+                    String strPath = fontSize.tifCurrent.getFilePath();
                     //取得目前TextInternalFrame物件開啟檔案的路徑與名稱
-                    if (!tifCurrent.isNew()) {
+                    if (!fontSize.tifCurrent.isNew()) {
                         //判斷TextInternalFrame物件開啟的是否為新的檔案
                         FileWriter fw = new FileWriter(strPath);
                         //建立輸出檔案的FileWriter物件
-                        tifCurrent.write(fw);
+                        fontSize.tifCurrent.write(fw);
                     } else {
                         saveFile(strPath); //儲存檔案
                     }
                     break;
                 case "另存新檔(A)":
-                    saveFile(tifCurrent.getFilePath()); //儲存檔案
+                    saveFile(fontSize.tifCurrent.getFilePath()); //儲存檔案
                     break;
                 case "PDF轉檔(Y)": {
                     JFileChooser fcOpen = new JFileChooser(
-                            tifCurrent.getFilePath());
+                            fontSize.tifCurrent.getFilePath());
                     //宣告JFileChooser物件
                     FileFilter fileFilter = NewFileFilter("PDF File", new String[]{"pdf"});
                     fcOpen.addChoosableFileFilter(fileFilter);
@@ -324,7 +216,7 @@ public class MDIEditor extends JFrame {
                         extractor.startExtraction(fi);
                         fe = fi[0].substring(0, fi[0].length() - 3) + "txt";//去尾
                         ff = file.getName().substring(0, file.getName().length() - 3) + "txt";//加上TXT
-                        createInternalFrame(fe, ff);//以取得的檔案建立TextInternalFrame物件
+                        fontSize.createInternalFrame(fe, ff);//以取得的檔案建立TextInternalFrame物件
                     }
                     break;
                 }
@@ -365,11 +257,11 @@ public class MDIEditor extends JFrame {
             //使用者按下 確認 按鈕
 
             File file = fcSave.getSelectedFile(); //取得選取的檔案
-            tifCurrent.write(new FileWriter(file));
+            fontSize.tifCurrent.write(new FileWriter(file));
             //將文字編輯內部框架的內容輸出至FileWriter物件
 
-            tifCurrent.setFileName(file.getName()); //設定編輯檔案名稱
-            tifCurrent.setFilePath(file.getPath()); //設定編輯檔案路徑
+            fontSize.tifCurrent.setFileName(file.getName()); //設定編輯檔案名稱
+            fontSize.tifCurrent.setFilePath(file.getPath()); //設定編輯檔案路徑
         }
     }
 
@@ -443,8 +335,8 @@ public class MDIEditor extends JFrame {
                                 String strPath = ((TextInternalFrame) elm).getFilePath();
                                 //取得TextInternalFrame目前編輯檔案的路徑
                                 //判斷TextInternalFrame目前編輯檔案是否為新的
-                                if (!tifCurrent.isNew()) {
-                                    tifCurrent.write(new FileWriter(strPath));
+                                if (!fontSize.tifCurrent.isNew()) {
+                                    fontSize.tifCurrent.write(new FileWriter(strPath));
                                     //將TextInternalFrame的內容寫入FileWriter物件
                                 } else {
                                     saveFile(strPath); //儲存檔案
@@ -472,7 +364,5 @@ public class MDIEditor extends JFrame {
         }
     };
 
-    public static void main(String args[]) {
-        MDIEditor api = new MDIEditor("PDF to TXT Editor with Music"); //建立視窗框架	
-    }
+
 }
