@@ -505,6 +505,7 @@ public class MDIEditor extends JFrame {
                         if (strCmp.equals("mp3") || strCmp.equals("MP3") || strCmp.equals("Mp3") || strCmp.equals("mP3")) {
                             mp3 = true;
                             try {
+<<<<<<< HEAD
                                 AudioFileFormat baseFileFormat = new MpegAudioFileReader().getAudioFileFormat(file);
                                 Map properties = baseFileFormat.properties();
                                 long duration = (long) properties.get("duration");//mp3長度
@@ -512,6 +513,12 @@ public class MDIEditor extends JFrame {
                                 player=new PlayMP3(fis,duration);
                                 player.play();
                             } catch (UnsupportedAudioFileException | IOException | JavaLayerException ex) {
+=======
+                                    FileInputStream fis = new FileInputStream(file.getPath());
+                                    player = new PlayMP3(fis);
+                                    player.play();
+                            } catch (FileNotFoundException | JavaLayerException ex) {
+>>>>>>> refs/remotes/NTOU-CS-JAVA2015/master
                                 System.out.println(ex.toString());
                             }
                         } else {
