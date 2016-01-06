@@ -10,6 +10,7 @@ import javax.swing.filechooser.FileFilter;
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*; //引用處理事件的event套件
+import javazoom.jl.decoder.JavaLayerException;
 
 public class MDIEditor extends JFrame {
 
@@ -29,11 +30,14 @@ public class MDIEditor extends JFrame {
     JLabel lbStatus; //顯示游標位置與選取字元的標籤
     Action acCut, acCopy, acPaste; //執行編輯動作的Action物件
 
-    AudioPlayer openYee=new AudioPlayer();//轉檔音效控制項
+    AudioPlayer openYee = new AudioPlayer();//轉檔音效控制項
     java.net.URL Yee = MDIEditor.class.getResource("/voice/Yee.aiff");//取得Yee.aiff的URL
-    
+
     AudioPlayer audio = null;//音樂控制項
+    PlayMP3 player = null;
     boolean musicFlag = false;//判斷是否開啟過音樂
+    boolean loop = true;//無窮迴圈
+    boolean mp3 = false;//判斷為mp3檔
 
     MDIEditor(String title) {
         super(title);//設定視窗名稱
@@ -130,7 +134,7 @@ public class MDIEditor extends JFrame {
         JMenu mnMusic = new JMenu("音樂(M)"); //宣告關於
         mnMusic.setMnemonic(KeyEvent.VK_M); //設定檔案功能表使用的記憶鍵
 
-        JMenuItem miOpenMusic = new JMenuItem("播放WAV檔音樂(O)", KeyEvent.VK_O),
+        JMenuItem miOpenMusic = new JMenuItem("開啟音樂檔(O)", KeyEvent.VK_O),
                 miPause = new JMenuItem("暫停(P)", KeyEvent.VK_P),
                 miContinue = new JMenuItem("繼續(K)", KeyEvent.VK_K),
                 miStop = new JMenuItem("停止(T)", KeyEvent.VK_T);
@@ -392,7 +396,8 @@ public class MDIEditor extends JFrame {
                     JFileChooser fcOpen = new JFileChooser(
                             tifCurrent.getFilePath());
                     //宣告JFileChooser物件
-                    fcOpen.addChoosableFileFilter(new TxtFileFilter("txt"));
+                    FileFilter fileFilter = NewFileFilter("TXT File", new String[]{"txt"});
+                    fcOpen.addChoosableFileFilter(fileFilter);
                     //設定篩選檔案的類型
                     fcOpen.setDialogTitle("開啟舊檔"); //設定檔案選擇對話盒的標題
                     result = fcOpen.showOpenDialog(MDIEditor.this);
@@ -428,16 +433,17 @@ public class MDIEditor extends JFrame {
                     JFileChooser fcOpen = new JFileChooser(
                             tifCurrent.getFilePath());
                     //宣告JFileChooser物件
-                    fcOpen.addChoosableFileFilter(new TxtFileFilter("pdf"));
+                    FileFilter fileFilter = NewFileFilter("PDF File", new String[]{"pdf"});
+                    fcOpen.addChoosableFileFilter(fileFilter);
                     //設定篩選檔案的類型
                     fcOpen.setDialogTitle("選擇要轉檔的PDF"); //設定檔案選擇對話盒的標題
                     result = fcOpen.showOpenDialog(MDIEditor.this);
                     //顯示開啟檔案對話盒
                     if (result == JFileChooser.APPROVE_OPTION) { //使用者按下 確認 按鈕
                         File file = fcOpen.getSelectedFile(); //取得選取的檔案
-                        try{
-                        openYee.loadAudio(Yee);//載入yee
-                        }catch(Exception YeeException){
+                        try {
+                            openYee.loadAudio(Yee);//載入yee
+                        } catch (Exception YeeException) {
                             System.out.println(YeeException.toString());
                         }
                         openYee.play();
@@ -446,10 +452,9 @@ public class MDIEditor extends JFrame {
                         String fi[] = {file.getPath()};
                         String fe, ff;
                         extractor.startExtraction(fi);
-                        fe = fi[0].substring(0, fi[0].length() - 3) + "txt";
-                        ff = file.getName().substring(0, file.getName().length() - 3) + "txt";
-                        createInternalFrame(fe, ff);
-                        //以取得的檔案建立TextInternalFrame物件
+                        fe = fi[0].substring(0, fi[0].length() - 3) + "txt";//去尾
+                        ff = file.getName().substring(0, file.getName().length() - 3) + "txt";//加上TXT
+                        createInternalFrame(fe, ff);//以取得的檔案建立TextInternalFrame物件
                     }
                     break;
                 }
@@ -470,7 +475,7 @@ public class MDIEditor extends JFrame {
     ActionListener music = (ActionEvent e) -> {
         int result;
         switch (e.getActionCommand()) {
-            case "播放WAV檔音樂(O)":
+            case "開啟音樂檔(O)":
                 if (musicFlag) {
                     JOptionPane.showMessageDialog(dpPane, "醒醒吧！你沒聽到聲音嗎？\n或許真的沒聽到？請停止播放再開檔！");
                 }
@@ -478,7 +483,8 @@ public class MDIEditor extends JFrame {
                     JFileChooser fcOpen = new JFileChooser(
                             tifCurrent.getFilePath());
                     //宣告JFileChooser物件
-                    fcOpen.addChoosableFileFilter(new TxtFileFilter("wav"));
+                    FileFilter fileFilter = NewFileFilter("Media Files", new String[]{"mp3", "au", "aiff", "wav"});
+                    fcOpen.addChoosableFileFilter(fileFilter);
                     //設定篩選檔案的類型
                     fcOpen.setDialogTitle("開啟WAV檔"); //設定檔案選擇對話盒的標題
                     result = fcOpen.showOpenDialog(MDIEditor.this);
@@ -486,31 +492,59 @@ public class MDIEditor extends JFrame {
                     if (result == JFileChooser.APPROVE_OPTION) {
                         //使用者按下 確認 按鈕
                         musicFlag = true;
+                        mp3 = false;
                         File file = fcOpen.getSelectedFile(); //取得選取的檔案
-                        audio = new AudioPlayer();
-                        audio.loadAudio(file.getPath());
-                        audio.setPlayCount(0);//0為持續播放
-                        audio.play();
+                        String strCmp = file.getPath().substring(file.getPath().length() - 3, file.getPath().length());
+                        if (strCmp.equals("mp3") || strCmp.equals("MP3") || strCmp.equals("Mp3") || strCmp.equals("mP3")) {
+                            mp3 = true;
+                            try {
+                                while (loop) {
+                                    FileInputStream fis = new FileInputStream(file.getPath());
+                                    player = new PlayMP3(fis);
+                                    player.play();
+                                }
+                            } catch (FileNotFoundException | JavaLayerException ex) {
+                                System.out.println(ex.toString());
+                            }
+                        } else {
+                            audio = new AudioPlayer();
+                            audio.loadAudio(file.getPath());
+                            audio.setPlayCount(0);//0為持續播放
+                            audio.play();
+                        }
                     }
                 }
                 break;
             case "暫停(P)":
                 if (musicFlag) {
-                    audio.pause();
+                    if (mp3) {
+                        player.pause();
+                    } else {
+                        audio.pause();
+                    }
                 } else {
                     JOptionPane.showMessageDialog(dpPane, "醒醒吧！你還沒開音樂！");
                 }
                 break;
             case "繼續(K)":
                 if (musicFlag) {
-                    audio.resume();
+                    if (mp3) {
+                        player.resume();
+                    } else {
+                        audio.resume();
+                    }
                 } else {
                     JOptionPane.showMessageDialog(dpPane, "醒醒吧！你還沒開音樂！");
                 }
                 break;
             case "停止(T)":
                 if (musicFlag) {
-                    audio.close();
+                    if (mp3) {
+                        player.stop();
+                        player.close();
+                    } else {
+                        audio.close();
+                    }
                     JOptionPane.showMessageDialog(dpPane, "要再次播放請重新選擇音樂！");
                     musicFlag = false;
                 } else {
@@ -556,7 +590,8 @@ public class MDIEditor extends JFrame {
         JFileChooser fcSave = new JFileChooser(path);  //建立檔案選取對話盒
         fcSave.setSelectedFile(new File(name)); //設定選取的檔案
 
-        fcSave.addChoosableFileFilter(new TxtFileFilter("txt"));
+        FileFilter fileFilter = NewFileFilter("TXT File", new String[]{"txt"});
+        fcSave.addChoosableFileFilter(fileFilter);
         //設定篩選檔案的類型
 
         fcSave.setDialogTitle("另存新檔"); //設定對話盒標題
@@ -577,45 +612,74 @@ public class MDIEditor extends JFrame {
     }
 
     //建立過濾檔案選擇對話盒內檔案類型的物件
-    class TxtFileFilter extends FileFilter {
-
-        String extension;
-
-        public TxtFileFilter(String ext) { //建構子
-            extension = ext;
-        }
-
-        @Override
-        public boolean accept(File f) {
-            if (f.isDirectory()) //若為資料夾傳回true
-            {
-                return true;
-            }
-
-            String ext = null;
-            String s = f.getName(); //取得檔案名稱
-            int i = s.lastIndexOf('.'); //尋找檔案名稱內的"."號
-
-            if (i > 0 && i < s.length() - 1) {
-                ext = s.substring(i + 1).toLowerCase();
-                //從檔案名稱內取得副檔名字
-
-                //判斷副檔名是否與檔案篩選物件的extension字串相同
-                if (ext.equals(extension)) {
+    private FileFilter NewFileFilter(final String desc, final String[] allowed_extensions) {
+        return new javax.swing.filechooser.FileFilter() {
+            @Override
+            public boolean accept(java.io.File f) {
+                if (f.isDirectory()) {
                     return true;
+                }
+                int pos = f.getName().lastIndexOf('.');
+                if (pos == -1) {
+                    return false;
+                } else {
+                    String extension = f.getName().substring(pos + 1);
+                    for (String allowed_extension : allowed_extensions) {
+                        if (extension.equalsIgnoreCase(allowed_extension)) {
+                            return true;
+                        }
+                    }
+                    return false;
                 }
             }
 
-            return false;
-        }
-
-        //傳回檔案篩選物件欲篩選檔案類型的描述字串
-        @Override
-        public String getDescription() {
-            return "篩選所需要的檔案";
-        }
+            @Override
+            public String getDescription() {
+                return desc;
+            }
+        };
     }
+    /*
+     //建立過濾檔案選擇對話盒內檔案類型的物件
+     class TxtFileFilter extends FileFilter {
 
+     String extension;
+
+     public TxtFileFilter(String ext) { //建構子
+     extension = ext;
+     }
+
+     @Override
+     public boolean accept(File f) {
+     if (f.isDirectory()) //若為資料夾傳回true
+     {
+     return true;
+     }
+
+     String ext = null;
+     String s = f.getName(); //取得檔案名稱
+     int i = s.lastIndexOf('.'); //尋找檔案名稱內的"."號
+
+     if (i > 0 && i < s.length() - 1) {
+     ext = s.substring(i + 1).toLowerCase();
+     //從檔案名稱內取得副檔名字
+
+     //判斷副檔名是否與檔案篩選物件的extension字串相同
+     if (ext.equals(extension)) {
+     return true;
+     }
+     }
+
+     return false;
+     }
+
+     //傳回檔案篩選物件欲篩選檔案類型的描述字串
+     @Override
+     public String getDescription() {
+     return "篩選所需要的檔案";
+     }
+     }
+     */
     //定義並宣告回應WindowEvent事件的WindowAdapter類別,
     //在關閉應用程式前, 運用監聽器判別程式內開啟的檔案是否已經儲存
     WindowAdapter wa = new WindowAdapter() {
