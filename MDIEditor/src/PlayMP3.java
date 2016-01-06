@@ -39,10 +39,8 @@ public class PlayMP3 {
                     final Runnable r = new Runnable() {
                         public void run() {
                             playInternal();
-                            System.out.println("789");
                             playerStatus = PLAYING;
                             playInternal();
-                            System.out.println("0000");
                         }
                     };
                     final Thread t = new Thread(r);
@@ -96,9 +94,7 @@ public class PlayMP3 {
     }
 
     private void playInternal() {
-        System.out.println("123");
         while (playerStatus != FINISHED) {
-            System.out.println("456");
             try {
                 if (!player.play(1)) {
                     break;
