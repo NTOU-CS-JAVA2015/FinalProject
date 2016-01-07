@@ -54,7 +54,14 @@ public class AboutMenu {
                     url = "https://github.com/vic4113110631";
                     break;
             }
-            Runtime.getRuntime().exec("cmd /c start " + url);
+            int dialogButton = JOptionPane.YES_NO_OPTION;
+                String href = "LINK to ".concat(e.getActionCommand().concat(" github"));
+            if (JOptionPane.showConfirmDialog(null, href, "True or false?",
+                JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                Runtime.getRuntime().exec("cmd /c start " + url);
+            } else {
+                // no option
+             }
         } catch (IOException ioe) {
             System.err.println(ioe.toString());
         }
