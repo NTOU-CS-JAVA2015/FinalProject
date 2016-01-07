@@ -17,15 +17,7 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.text.DefaultEditorKit;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-/**
- *
- * @author yuhang
- */
+
 public class Editor {
 
     TextInternalFrame tifCurrent;
@@ -35,7 +27,6 @@ public class Editor {
 
     Editor(JMenu mnFontSize, MDIEditor MDIEditorin, WindowMenu wmWindowin) {
 
-        //tifCurrent = MDIEditorin.tifCurrent;
         MDIEditor = MDIEditorin;
         tbFontSize = MDIEditorin.tbFontSize;
         wmWindow = wmWindowin;
