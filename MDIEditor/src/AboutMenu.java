@@ -4,26 +4,19 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author yuhang
- */
 public class AboutMenu {
-    AboutMenu(JMenu mnAbout){
-                JMenuItem miIntroduce = new JMenuItem("Team Member"),
+
+    AboutMenu(JMenu mnAbout) {
+        JMenuItem miIntroduce = new JMenuItem("Team Project"),
                 miNatLee = new JMenuItem("00181034 李映澤"),
                 miYuHang = new JMenuItem("00257122 張語航"),
                 miFinianrry = new JMenuItem("00257138 吳彥澄"),
                 miTommy = new JMenuItem("00257141 陳平揚"),
                 miVic = new JMenuItem("00257148 陳威任");
 
+        miIntroduce.addActionListener(about);
         miNatLee.addActionListener(about);
         miYuHang.addActionListener(about);
         miFinianrry.addActionListener(about);
@@ -32,17 +25,21 @@ public class AboutMenu {
 
         mnAbout.add(miIntroduce);
         mnAbout.addSeparator();
+        mnAbout.addSeparator();
         mnAbout.add(miNatLee);
         mnAbout.add(miYuHang);
         mnAbout.add(miFinianrry);
         mnAbout.add(miTommy);
         mnAbout.add(miVic);
     }
-    
-        ActionListener about = (ActionEvent e) -> {
+
+    ActionListener about = (ActionEvent e) -> {
         try {
             String url = "";
             switch (e.getActionCommand()) {
+                case "Team Project":
+                    url = "https://github.com/NTOU-CS-JAVA2015/FinalProject";
+                    break;
                 case "00181034 李映澤":
                     url = "https://github.com/NatLee";
                     break;
@@ -59,7 +56,15 @@ public class AboutMenu {
                     url = "https://github.com/vic4113110631";
                     break;
             }
-            Runtime.getRuntime().exec("cmd /c start " + url);
+            int dialogButton = JOptionPane.YES_NO_OPTION;
+                String href = "LINK to ".concat(e.getActionCommand().concat(" github"));
+            if (JOptionPane.showConfirmDialog(null, href, "True or false?",
+                JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                Runtime.getRuntime().exec("cmd /c start " + url);
+            } else {
+                // no option
+             }
+            
         } catch (IOException ioe) {
             System.err.println(ioe.toString());
         }

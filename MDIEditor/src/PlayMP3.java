@@ -10,7 +10,6 @@ public class PlayMP3 {
     private final static int PLAYING = 1;
     private final static int PAUSED = 2;
     private final static int FINISHED = 3;
-    private final long duration;
 
 
     // the player actually doing all the work
@@ -22,9 +21,8 @@ public class PlayMP3 {
     // status variable what player thread is doing/supposed to do
     private int playerStatus = NOTSTARTED;
 
-    public PlayMP3(final InputStream inputStream,long duration) throws JavaLayerException {
+    public PlayMP3(final InputStream inputStream) throws JavaLayerException {
         this.player = new Player(inputStream);
-        this.duration = duration;
     }
 
     /**

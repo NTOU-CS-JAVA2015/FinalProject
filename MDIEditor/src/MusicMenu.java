@@ -43,10 +43,10 @@ public class MusicMenu {
     PlayMP3 player = null;
     AudioPlayer audio = null;//音樂控制項
 
-    MusicMenu(JMenu mnMusic, JDesktopPane dpPanein, TextInternalFrame tifCurrentin, MDIEditor MDIEditorin) {
+    MusicMenu(JMenu mnMusic, MDIEditor MDIEditorin) {
         MDIEditor = MDIEditorin;
-        dpPane = dpPanein;
-        tifCurrent = tifCurrentin;
+        dpPane = MDIEditorin.dpPane;
+        tifCurrent = MDIEditorin.fontSize.tifCurrent;
         JMenuItem miOpenMusic = new JMenuItem("開啟音樂檔(O)", KeyEvent.VK_O),
                 miPause = new JMenuItem("暫停(P)", KeyEvent.VK_P),
                 miContinue = new JMenuItem("繼續(K)", KeyEvent.VK_K),
@@ -105,7 +105,7 @@ public class MusicMenu {
                                         if (scheduling) {
                                             try {
                                                 FileInputStream fis = new FileInputStream(file.getPath());
-                                                player = new PlayMP3(fis, duration);
+                                                player = new PlayMP3(fis);
                                                 player.play();
                                             } catch (FileNotFoundException | JavaLayerException ex) {
                                                 System.out.println(ex.toString());
