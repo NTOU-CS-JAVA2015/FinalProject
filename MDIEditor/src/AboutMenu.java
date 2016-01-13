@@ -1,7 +1,10 @@
 
+import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
@@ -33,31 +36,35 @@ public class AboutMenu {
     }
 
     ActionListener about = (ActionEvent e) -> {
-        try {
-            String url = "";
-            switch (e.getActionCommand()) {
-                case "Team Project":
-                    url = "https://github.com/NTOU-CS-JAVA2015/FinalProject";
-                    break;
-                case "00181034 李映澤":
-                    url = "https://github.com/NatLee";
-                    break;
-                case "00257122 張語航":
-                    url = "https://github.com/changyuhang";
-                    break;
-                case "00257138 吳彥澄":
-                    url = "https://github.com/FinianWu";
-                    break;
-                case "00257141 陳平揚":
-                    url = "https://github.com/ethanhunt0707";
-                    break;
-                case "00257148 陳威任":
-                    url = "https://github.com/vic4113110631";
-                    break;
-            }
-            Runtime.getRuntime().exec("cmd /c start " + url);
-        } catch (IOException ioe) {
-            System.err.println(ioe.toString());
+        String url = "";
+        switch (e.getActionCommand()) {
+            case "Team Project":
+                url = "https://github.com/NTOU-CS-JAVA2015/FinalProject";
+                break;
+            case "00181034 李映澤":
+                url = "https://github.com/NatLee";
+                break;
+            case "00257122 張語航":
+                url = "https://github.com/changyuhang";
+                break;
+            case "00257138 吳彥澄":
+                url = "https://github.com/FinianWu";
+                break;
+            case "00257141 陳平揚":
+                url = "https://github.com/ethanhunt0707";
+                break;
+            case "00257148 陳威任":
+                url = "https://github.com/vic4113110631";
+                break;
         }
+        openWebpage("url");
     };
+
+    public static void openWebpage(String urlString) {
+        try {
+            Desktop.getDesktop().browse(new URL(urlString).toURI());
+        } catch (URISyntaxException | IOException e) {
+            System.out.println("url error");
+        }
+    }
 }
