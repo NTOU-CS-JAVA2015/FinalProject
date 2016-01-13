@@ -22,11 +22,14 @@ import javax.swing.text.BadLocationException;
  *
  * @author yuhang
  */
-public class FileMenu extends JFrame{
+public class FileMenu extends JFrame {
+
     MDIEditor MDIEditor;
-    
+    AudioPlayer openYee = new AudioPlayer();//轉檔音效控制項
+    java.net.URL Yee = MDIEditor.class.getResource("/voice/Yee.aiff");//取得Yee.aiff的URL
+
     FileMenu(JMenu mnFile, MDIEditor MDIEditorin) {
-        MDIEditor=MDIEditorin;
+        MDIEditor = MDIEditorin;
         JMenuItem miNew = new JMenuItem("新增(N)", KeyEvent.VK_N),
                 miOpen = new JMenuItem("開啟舊檔(O)", KeyEvent.VK_O),
                 miSave = new JMenuItem("儲存檔案(S)", KeyEvent.VK_S),
@@ -92,11 +95,11 @@ public class FileMenu extends JFrame{
                         //建立輸出檔案的FileWriter物件
                         MDIEditor.internalFrame.tifCurrent.write(fw);
                     } else {
-                        saveFile(strPath); //儲存檔案
+                        MDIEditor.saveFile(strPath); //儲存檔案
                     }
                     break;
                 case "另存新檔(A)":
-                    saveFile(MDIEditor.internalFrame.tifCurrent.getFilePath()); //儲存檔案
+                    MDIEditor.saveFile(MDIEditor.internalFrame.tifCurrent.getFilePath()); //儲存檔案
                     break;
                 case "PDF轉TXT(Y)":
                     JFileChooser fcOpen = new JFileChooser(MDIEditor.internalFrame.tifCurrent.getFilePath());
@@ -112,11 +115,11 @@ public class FileMenu extends JFrame{
                     if (result == JFileChooser.APPROVE_OPTION) { //使用者按下 確認 按鈕
                         File file = fcOpen.getSelectedFile(); //取得選取的檔案
                         try {
-                            MDIEditor.openYee.loadAudio(MDIEditor.Yee);//載入yee
+                            openYee.loadAudio(Yee);//載入yee
                         } catch (Exception YeeException) {
                             System.out.println(YeeException.toString());
                         }
-                        MDIEditor.openYee.play();
+                        openYee.play();
                         System.setProperty("apple.awt.UIElement", "true");
                         ExtractText extractor = new ExtractText();
                         String fi[] = {file.getPath()};
@@ -131,7 +134,7 @@ public class FileMenu extends JFrame{
                     TextToPDF textToPDF = new TextToPDF();
                     break;
                 case "結束(E)":
-                   processWindowEvent(
+                    processWindowEvent(
                             new WindowEvent(MDIEditor,
                                     WindowEvent.WINDOW_CLOSING));
                     //執行WindowEvent事件, 觸發MDIEditor視窗框架的關閉視窗事件
@@ -144,7 +147,7 @@ public class FileMenu extends JFrame{
         }
     };
 
-    public void saveFile(String strPath) //儲存檔案
+    /*public void saveFile(String strPath) //儲存檔案
             throws IOException, BadLocationException {
 
         int pos = strPath.lastIndexOf("\\");
@@ -174,7 +177,7 @@ public class FileMenu extends JFrame{
             MDIEditor.internalFrame.tifCurrent.setFilePath(file.getPath()); //設定編輯檔案路徑
         }
     }
-
+     */
     //建立過濾檔案選擇對話盒內檔案類型的物件
     public FileFilter NewFileFilter(final String desc, final String[] allowed_extensions) {
         return new FileFilter() {//建構子

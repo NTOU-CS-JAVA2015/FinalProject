@@ -1,5 +1,7 @@
 
+import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JToggleButton;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.InternalFrameAdapter;
@@ -19,7 +21,10 @@ public class InternalFrame {
     TextInternalFrame tifCurrent;
     WindowMenu wmWindow;
     MDIEditor MDIEditor;
-
+    JCheckBoxMenuItem cbmiSize16, cbmiSize18, cbmiSize20;//控制字級大小的核取方塊選項
+    JToggleButton tbnSize16, tbnSize18, tbnSize20;
+    Action acCut, acCopy, acPaste; //執行編輯動作的Action物件
+    
     //建立文字編輯內部框架
     InternalFrame(MDIEditor MDIEditorin, WindowMenu wmWindowin) {
         MDIEditor = MDIEditorin;
@@ -80,16 +85,16 @@ public class InternalFrame {
             //取得TextInternalFrame物件顯示內容使用的字級大小
             switch (tifCurrent.geteditor()) {
                 case 16:
-                    MDIEditor.cbmiSize16.setSelected(true); //設定對應的控制項為選取
-                    MDIEditor.tbnSize16.setSelected(true);
+                    cbmiSize16.setSelected(true); //設定對應的控制項為選取
+                    tbnSize16.setSelected(true);
                     break;
                 case 18:
-                    MDIEditor.cbmiSize18.setSelected(true);
-                    MDIEditor.tbnSize18.setSelected(true);
+                    cbmiSize18.setSelected(true);
+                    tbnSize18.setSelected(true);
                     break;
                 case 20:
-                    MDIEditor.cbmiSize20.setSelected(true);
-                    MDIEditor.tbnSize20.setSelected(true);
+                    cbmiSize20.setSelected(true);
+                    tbnSize20.setSelected(true);
                     break;
             }
 
@@ -115,15 +120,15 @@ public class InternalFrame {
                         + " 個字元" + ", 選取範圍 : " + e.getDot() + "至" + e.getMark());
                 //設定狀態列內的文字
 
-                MDIEditor.acCut.setEnabled(true);
-                MDIEditor.acCopy.setEnabled(true);
+                acCut.setEnabled(true);
+                acCopy.setEnabled(true);
                 //設定執行剪下與複製動字的Action元件為有效
             } else {
                 MDIEditor.lbStatus.setText("目前位置 : 第 " + e.getDot() + " 個字元");
                 //設定狀態列內的文字
 
-                MDIEditor.acCut.setEnabled(false);
-                MDIEditor.acCopy.setEnabled(false);
+                acCut.setEnabled(false);
+                acCopy.setEnabled(false);
                 //設定執行剪下與複製動字的Action元件為無效
             }
         }

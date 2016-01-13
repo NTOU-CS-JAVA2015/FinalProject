@@ -26,18 +26,17 @@ public class MusicMenu {
 
     boolean musicFlag = false;//判斷是否開啟過音樂
     JDesktopPane dpPane;
-    TextInternalFrame tifCurrent;
     boolean mp3 = false;//判斷為mp3檔
     MDIEditor MDIEditor;
     ScheduledExecutorService scheduler;
     boolean scheduling = false;//判斷是否排程
     PlayMP3 player = null;
     AudioPlayer audio = null;//音樂控制項
+    
 
     MusicMenu(JMenu mnMusic, MDIEditor MDIEditorin) {
         MDIEditor = MDIEditorin;
         dpPane = MDIEditorin.dpPane;
-        tifCurrent = MDIEditorin.internalFrame.tifCurrent;
         JMenuItem miOpenMusic = new JMenuItem("開啟音樂檔(O)", KeyEvent.VK_O),
                 miPause = new JMenuItem("暫停(P)", KeyEvent.VK_P),
                 miContinue = new JMenuItem("繼續(K)", KeyEvent.VK_K),
@@ -65,9 +64,9 @@ public class MusicMenu {
                 }
                 if (!musicFlag) {
                     JFileChooser fcOpen = new JFileChooser(
-                            tifCurrent.getFilePath());
+                            MDIEditor.internalFrame.tifCurrent.getFilePath());
                     //宣告JFileChooser物件
-                    FileFilter fileFilter = MDIEditor.NewFileFilter("Media Files", new String[]{"mp3", "au", "aiff", "wav"});
+                    FileFilter fileFilter = MDIEditor.fileMenu.NewFileFilter("Media Files", new String[]{"mp3", "au", "aiff", "wav"});
                     fcOpen.addChoosableFileFilter(fileFilter);
                     //設定篩選檔案的類型
                     fcOpen.setDialogTitle("開啟音樂檔"); //設定檔案選擇對話盒的標題

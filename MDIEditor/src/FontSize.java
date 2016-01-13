@@ -22,11 +22,11 @@ import javax.swing.JToggleButton;
  */
 public class FontSize {
 
-    MDIEditor MDIEditor;
+    InternalFrame internalFrame;
 
-    FontSize(JMenu mneditor, MDIEditor MDIEditorin) {
+    FontSize(JMenu mneditor, InternalFrame internalFramein) {
 
-        MDIEditor = MDIEditorin;
+        internalFrame = internalFramein;
         java.net.URL imgSize16URL = MDIEditor.class.getResource("/icon/size16.png");
         java.net.URL imgSize18URL = MDIEditor.class.getResource("/icon/size18.png");
         java.net.URL imgSize20URL = MDIEditor.class.getResource("/icon/size20.png");
@@ -35,46 +35,46 @@ public class FontSize {
         FontSize.EditorAction fsaSize20 = new FontSize.EditorAction("20(L)", new ImageIcon(imgSize20URL), "設定字體大小為20", KeyEvent.VK_L);
         //宣告執行字級大小設定動作的Action物件
 
-        MDIEditorin.cbmiSize16 = new JCheckBoxMenuItem(fsaSize16);
-        MDIEditorin.cbmiSize18 = new JCheckBoxMenuItem(fsaSize18);
-        MDIEditorin.cbmiSize20 = new JCheckBoxMenuItem(fsaSize20);
+        internalFrame.cbmiSize16 = new JCheckBoxMenuItem(fsaSize16);
+        internalFrame.cbmiSize18 = new JCheckBoxMenuItem(fsaSize18);
+        internalFrame.cbmiSize20 = new JCheckBoxMenuItem(fsaSize20);
         //以執行字級大小設定之Action物件建立核取方塊選項
 
-        MDIEditorin.cbmiSize16.setIcon(null); //設定核取方塊選項不使用圖示
-        MDIEditorin.cbmiSize18.setIcon(null);
-        MDIEditorin.cbmiSize20.setIcon(null);
+        internalFrame.cbmiSize16.setIcon(null); //設定核取方塊選項不使用圖示
+        internalFrame.cbmiSize18.setIcon(null);
+        internalFrame.cbmiSize20.setIcon(null);
 
-        MDIEditorin.cbmiSize16.setState(true); //設定選取代表16字級的核取方塊選項
+        internalFrame.cbmiSize16.setState(true); //設定選取代表16字級的核取方塊選項
 
-        mneditor.add(MDIEditorin.cbmiSize16); //將核取方塊選項加入功能表
-        mneditor.add(MDIEditorin.cbmiSize18);
-        mneditor.add(MDIEditorin.cbmiSize20);
+        mneditor.add(internalFrame.cbmiSize16); //將核取方塊選項加入功能表
+        mneditor.add(internalFrame.cbmiSize18);
+        mneditor.add(internalFrame.cbmiSize20);
 
         ButtonGroup bgSize = new ButtonGroup(); //宣告按鈕群組
-        bgSize.add(MDIEditorin.cbmiSize16); //將核取方塊選項加入按鈕群組
-        bgSize.add(MDIEditorin.cbmiSize18);
-        bgSize.add(MDIEditorin.cbmiSize20);
+        bgSize.add(internalFrame.cbmiSize16); //將核取方塊選項加入按鈕群組
+        bgSize.add(internalFrame.cbmiSize18);
+        bgSize.add(internalFrame.cbmiSize20);
 
-        MDIEditorin.tbnSize16 = new JToggleButton(fsaSize16);
-        MDIEditorin.tbnSize18 = new JToggleButton(fsaSize18);
-        MDIEditorin.tbnSize20 = new JToggleButton(fsaSize20);
+        internalFrame.tbnSize16 = new JToggleButton(fsaSize16);
+        internalFrame.tbnSize18 = new JToggleButton(fsaSize18);
+        internalFrame.tbnSize20 = new JToggleButton(fsaSize20);
         //以執行字級大小設定的Action物件, 宣告工具列的JToggleButton按鈕
 
-        MDIEditorin.tbnSize16.setActionCommand("16(S)");
-        MDIEditorin.tbnSize18.setActionCommand("18(M)");
-        MDIEditorin.tbnSize20.setActionCommand("20(L)");
+        internalFrame.tbnSize16.setActionCommand("16(S)");
+        internalFrame.tbnSize18.setActionCommand("18(M)");
+        internalFrame.tbnSize20.setActionCommand("20(L)");
         //因為按鈕不顯示字串,故必須設定動作命令字串, 以便於回應事件時判別
 
-        MDIEditorin.tbnSize16.setText(null); //設定JToggleButton按鈕不顯示字串
-        MDIEditorin.tbnSize18.setText(null);
-        MDIEditorin.tbnSize20.setText(null);
+        internalFrame.tbnSize16.setText(null); //設定JToggleButton按鈕不顯示字串
+        internalFrame.tbnSize18.setText(null);
+        internalFrame.tbnSize20.setText(null);
 
-        MDIEditorin.tbnSize16.setSelected(true);//設定選取代表16字級的JToggleButton按鈕
+        internalFrame.tbnSize16.setSelected(true);//設定選取代表16字級的JToggleButton按鈕
 
         ButtonGroup bgToolBar = new ButtonGroup(); //宣告按鈕群組
-        bgToolBar.add(MDIEditorin.tbnSize16); //將JToggleButton按鈕加入按鈕群組
-        bgToolBar.add(MDIEditorin.tbnSize18);
-        bgToolBar.add(MDIEditorin.tbnSize20);
+        bgToolBar.add(internalFrame.tbnSize16); //將JToggleButton按鈕加入按鈕群組
+        bgToolBar.add(internalFrame.tbnSize18);
+        bgToolBar.add(internalFrame.tbnSize20);
     }
 
     //定義執行文字字級設定的Action物件
@@ -92,21 +92,21 @@ public class FontSize {
             //依照動作命令字串判別欲執行的動作
             switch (e.getActionCommand()) {
                 case "20(L)":
-                    MDIEditor.internalFrame.tifCurrent.seteditor(20);
+                    internalFrame.tifCurrent.seteditor(20);
                     //設定文字編輯面版使用20級字
-                    MDIEditor.cbmiSize20.setSelected(true); //設定對應的控制項為選取
-                    MDIEditor.tbnSize20.setSelected(true);
+                    internalFrame.cbmiSize20.setSelected(true); //設定對應的控制項為選取
+                    internalFrame.tbnSize20.setSelected(true);
                     break;
                 case "18(M)":
-                    MDIEditor.internalFrame.tifCurrent.seteditor(18);
-                    MDIEditor.cbmiSize18.setSelected(true);
-                    MDIEditor.tbnSize18.setSelected(true);
+                    internalFrame.tifCurrent.seteditor(18);
+                    internalFrame.cbmiSize18.setSelected(true);
+                    internalFrame.tbnSize18.setSelected(true);
                     break;
                 default:
                     //預設16級字
-                    MDIEditor.internalFrame.tifCurrent.seteditor(16);
-                    MDIEditor.cbmiSize16.setSelected(true);
-                    MDIEditor.tbnSize16.setSelected(true);
+                    internalFrame.tifCurrent.seteditor(16);
+                    internalFrame.cbmiSize16.setSelected(true);
+                    internalFrame.tbnSize16.setSelected(true);
                     break;
             }
         }
