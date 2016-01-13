@@ -4,7 +4,6 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 
 public class AboutMenu {
 
@@ -16,6 +15,7 @@ public class AboutMenu {
                 miTommy = new JMenuItem("00257141 陳平揚"),
                 miVic = new JMenuItem("00257148 陳威任");
 
+        miIntroduce.addActionListener(about);
         miNatLee.addActionListener(about);
         miYuHang.addActionListener(about);
         miFinianrry.addActionListener(about);
@@ -55,14 +55,7 @@ public class AboutMenu {
                     url = "https://github.com/vic4113110631";
                     break;
             }
-            int dialogButton = JOptionPane.YES_NO_OPTION;
-                String href = "LINK to ".concat(e.getActionCommand().concat(" github"));
-            if (JOptionPane.showConfirmDialog(null, href, "True or false?",
-                JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-                Runtime.getRuntime().exec("cmd /c start " + url);
-            } else {
-                // no option
-             }
+            Runtime.getRuntime().exec("cmd /c start " + url);
         } catch (IOException ioe) {
             System.err.println(ioe.toString());
         }

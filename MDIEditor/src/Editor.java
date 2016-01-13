@@ -17,18 +17,27 @@ import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 import javax.swing.text.DefaultEditorKit;
 
-
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+/**
+ *
+ * @author yuhang
+ */
 public class Editor {
 
     TextInternalFrame tifCurrent;
-    JToolBar tbFontSize;
+    JToolBar toolBar;
     MDIEditor MDIEditor;
     WindowMenu wmWindow;
 
-    Editor(JMenu mnFontSize, MDIEditor MDIEditorin, WindowMenu wmWindowin) {
+    Editor(JMenu mneditor, MDIEditor MDIEditorin, WindowMenu wmWindowin) {
 
+        //tifCurrent = MDIEditorin.tifCurrent;
         MDIEditor = MDIEditorin;
-        tbFontSize = MDIEditorin.tbFontSize;
+        toolBar = MDIEditorin.toolBar;
         wmWindow = wmWindowin;
         java.net.URL imgSize16URL = MDIEditor.class.getResource("/icon/size16.png");
         java.net.URL imgSize18URL = MDIEditor.class.getResource("/icon/size18.png");
@@ -49,9 +58,9 @@ public class Editor {
 
         MDIEditorin.cbmiSize16.setState(true); //設定選取代表16字級的核取方塊選項
 
-        mnFontSize.add(MDIEditorin.cbmiSize16); //將核取方塊選項加入功能表
-        mnFontSize.add(MDIEditorin.cbmiSize18);
-        mnFontSize.add(MDIEditorin.cbmiSize20);
+        mneditor.add(MDIEditorin.cbmiSize16); //將核取方塊選項加入功能表
+        mneditor.add(MDIEditorin.cbmiSize18);
+        mneditor.add(MDIEditorin.cbmiSize20);
 
         ButtonGroup bgSize = new ButtonGroup(); //宣告按鈕群組
         bgSize.add(MDIEditorin.cbmiSize16); //將核取方塊選項加入按鈕群組
@@ -95,19 +104,19 @@ public class Editor {
             //依照動作命令字串判別欲執行的動作
             switch (e.getActionCommand()) {
                 case "20(L)":
-                    tifCurrent.setFontSize(20);
+                    tifCurrent.seteditor(20);
                     //設定文字編輯面版使用20級字
                     MDIEditor.cbmiSize20.setSelected(true); //設定對應的控制項為選取
                     MDIEditor.tbnSize20.setSelected(true);
                     break;
                 case "18(M)":
-                    tifCurrent.setFontSize(18);
+                    tifCurrent.seteditor(18);
                     MDIEditor.cbmiSize18.setSelected(true);
                     MDIEditor.tbnSize18.setSelected(true);
                     break;
                 default:
                     //預設16級字
-                    tifCurrent.setFontSize(16);
+                    tifCurrent.seteditor(16);
                     MDIEditor.cbmiSize16.setSelected(true);
                     MDIEditor.tbnSize16.setSelected(true);
                     break;
@@ -168,7 +177,7 @@ public class Editor {
             //設定視窗功能表內代表此TextInternalFrame物件的核取方塊選項為選取
 
             //取得TextInternalFrame物件顯示內容使用的字級大小
-            switch (tifCurrent.getFontSize()) {
+            switch (tifCurrent.geteditor()) {
                 case 16:
                     MDIEditor.cbmiSize16.setSelected(true); //設定對應的控制項為選取
                     MDIEditor.tbnSize16.setSelected(true);

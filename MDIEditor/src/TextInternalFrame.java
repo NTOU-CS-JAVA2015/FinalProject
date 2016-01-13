@@ -18,7 +18,7 @@ class TextInternalFrame extends JInternalFrame {
     JCheckBoxMenuItem cbmi; //代表內部框架的核取方塊選項,
     //將加入至MDIEditor所建立視窗框架的視窗功能表
 
-    int fontSize = 16; //設定字級大小為16
+    int editor = 16; //設定字級大小為16
 
     TextInternalFrame(String... strArgs) { //建構子
 
@@ -48,7 +48,7 @@ class TextInternalFrame extends JInternalFrame {
         cbmi = new JCheckBoxMenuItem(strFileName);
         //以內部框架編輯之檔案的名稱宣告核取方塊選項
 
-        tpContent.setFont(new Font("Times-Roman", Font.BOLD, fontSize));
+        tpContent.setFont(new Font("Times-Roman", Font.BOLD, editor));
         //設定文字編輯面版使用的字型
 
         setSize(300, 200); //設定內部視窗框架的大小
@@ -107,15 +107,15 @@ class TextInternalFrame extends JInternalFrame {
     } //取得文字編輯面版
 
     //設定字級大小
-    public void setFontSize(int size) {
+    public void seteditor(int size) {
         tpContent.setFont(new Font("Times-Roman", Font.BOLD, size));
         //設定文字編輯面版使用的字級大小
 
-        fontSize = size; //更新屬性
+        editor = size; //更新屬性
     }
 
-    public int getFontSize() {
-        return fontSize;
+    public int geteditor() {
+        return editor;
     } //取得使用的字級大小
 
     //將內部框架編輯的內容輸出至Writer

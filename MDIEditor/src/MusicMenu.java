@@ -22,15 +22,6 @@ import javax.swing.filechooser.FileFilter;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.spi.mpeg.sampled.file.MpegAudioFileReader;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-/**
- *
- * @author yuhang
- */
 public class MusicMenu {
 
     boolean musicFlag = false;//判斷是否開啟過音樂
@@ -46,7 +37,7 @@ public class MusicMenu {
     MusicMenu(JMenu mnMusic, MDIEditor MDIEditorin) {
         MDIEditor = MDIEditorin;
         dpPane = MDIEditorin.dpPane;
-        tifCurrent = MDIEditorin.fontSize.tifCurrent;
+        tifCurrent = MDIEditorin.editor.tifCurrent;
         JMenuItem miOpenMusic = new JMenuItem("開啟音樂檔(O)", KeyEvent.VK_O),
                 miPause = new JMenuItem("暫停(P)", KeyEvent.VK_P),
                 miContinue = new JMenuItem("繼續(K)", KeyEvent.VK_K),
@@ -79,7 +70,7 @@ public class MusicMenu {
                     FileFilter fileFilter = MDIEditor.NewFileFilter("Media Files", new String[]{"mp3", "au", "aiff", "wav"});
                     fcOpen.addChoosableFileFilter(fileFilter);
                     //設定篩選檔案的類型
-                    fcOpen.setDialogTitle("開啟WAV檔"); //設定檔案選擇對話盒的標題
+                    fcOpen.setDialogTitle("開啟音樂檔"); //設定檔案選擇對話盒的標題
                     result = fcOpen.showOpenDialog(MDIEditor);
                     //顯示開啟檔案對話盒
                     if (result == JFileChooser.APPROVE_OPTION) {
@@ -88,7 +79,7 @@ public class MusicMenu {
                         mp3 = false;
                         File file = fcOpen.getSelectedFile(); //取得選取的檔案
                         String strCmp = file.getPath().substring(file.getPath().length() - 3, file.getPath().length());
-                        if (strCmp.equals("mp3") || strCmp.equals("MP3") || strCmp.equals("Mp3") || strCmp.equals("mP3")) {
+                        if (strCmp.toLowerCase().equals("mp3")) {
                             mp3 = true;
                             try {
                                 AudioFileFormat baseFileFormat = new MpegAudioFileReader().getAudioFileFormat(file);
@@ -97,22 +88,19 @@ public class MusicMenu {
 
                                 scheduler = Executors.newSingleThreadScheduledExecutor();
                                 scheduling = true;
-                                final ScheduledFuture future = scheduler.scheduleAtFixedRate(new Runnable() {
-                                    //設定排程
-                                    @Override
-                                    public void run() {
-                                        // 排程工作
-                                        if (scheduling) {
-                                            try {
-                                                FileInputStream fis = new FileInputStream(file.getPath());
-                                                player = new PlayMP3(fis);
-                                                player.play();
-                                            } catch (FileNotFoundException | JavaLayerException ex) {
-                                                System.out.println(ex.toString());
-                                            }
+                                final ScheduledFuture future = scheduler.scheduleAtFixedRate(() -> {
+                                    // 排程工作
+                                    if (scheduling) {
+                                        try {
+                                            FileInputStream fis = new FileInputStream(file.getPath());
+                                            player = new PlayMP3(fis);
+                                            player.play();
+                                        } catch (FileNotFoundException | JavaLayerException ex) {
+                                            System.out.println(ex.toString());
                                         }
                                     }
-                                }, 0, duration + 5000, TimeUnit.MICROSECONDS);//0微秒開始執行，每duration+5000微秒執行一次
+                                } //設定排程
+                                        , 0, duration + 5000, TimeUnit.MICROSECONDS);//0微秒開始執行，每duration+5000微秒執行一次
 
                             } catch (UnsupportedAudioFileException | IOException ex) {
                                 System.out.println(ex.toString());
