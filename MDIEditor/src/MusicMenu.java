@@ -37,7 +37,7 @@ public class MusicMenu {
     MusicMenu(JMenu mnMusic, MDIEditor MDIEditorin) {
         MDIEditor = MDIEditorin;
         dpPane = MDIEditorin.dpPane;
-        tifCurrent = MDIEditorin.editor.tifCurrent;
+        tifCurrent = MDIEditorin.internalFrame.tifCurrent;
         JMenuItem miOpenMusic = new JMenuItem("開啟音樂檔(O)", KeyEvent.VK_O),
                 miPause = new JMenuItem("暫停(P)", KeyEvent.VK_P),
                 miContinue = new JMenuItem("繼續(K)", KeyEvent.VK_K),
