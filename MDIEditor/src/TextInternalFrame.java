@@ -33,7 +33,7 @@ class TextInternalFrame extends JInternalFrame {
             isNew = false; //設定不為新開啟的檔案
 
             try {
-                tpContent.read(new FileReader(strFilePath), null);
+                tpContent.read(new InputStreamReader(new FileInputStream(strFilePath), "UTF-8"), null);
                 //以傳入的檔案路徑名稱宣告FileReader物件
             } catch (IOException ioe) {
                 System.err.println("檔案讀取發生問題");
