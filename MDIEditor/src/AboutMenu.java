@@ -57,7 +57,7 @@ public class AboutMenu {
                 url = "https://github.com/vic4113110631";
                 break;
         }
-        openWebpage("url");
+        openWebpage(url);
     };
 
     public static void openWebpage(String urlString) {
