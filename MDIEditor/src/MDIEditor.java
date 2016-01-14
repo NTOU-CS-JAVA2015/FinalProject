@@ -12,29 +12,29 @@ public class MDIEditor extends JFrame {
 
     WindowMenu wmWindow = new WindowMenu("視窗(W)", KeyEvent.VK_W);
     //控制內部視窗畫面切換的功能表
-    
+
     JToolBar toolBar;
     JLabel lbStatus; //顯示游標位置與選取字元的標籤
 
-    InternalFrame internalFrame;
+    InternalEditor internalEditor;
     FileMenu fileMenu;
 
     MDIEditor(String title) {
         super(title);//設定視窗名稱
-        internalFrame = new InternalFrame(MDIEditor.this, wmWindow);
-        internalFrame.createInternalFrame(); //建立第一個內部框架
+        internalEditor = new InternalEditor(MDIEditor.this, wmWindow);
+        internalEditor.createInternalFrame(); //建立第一個內部框架
 
         JMenu mnFile = new JMenu("檔案(F)"); //宣告檔案功能表
         mnFile.setMnemonic(KeyEvent.VK_F); //設定檔案功能表使用的記憶鍵
-        fileMenu = new FileMenu(mnFile,MDIEditor.this);
+        fileMenu = new FileMenu(mnFile, MDIEditor.this);
 
         JMenu mnEdit = new JMenu("編輯(E)"); //宣告編輯功能表
         mnEdit.setMnemonic(KeyEvent.VK_E); //設定編輯功能表的記憶鍵
-        Edit edit = new Edit(mnEdit, internalFrame);
-        
+        Edit edit = new Edit(mnEdit, internalEditor);
+
         JMenu mnFontSize = new JMenu("字級(S)"); //宣告字級功能表
         mnFontSize.setMnemonic(KeyEvent.VK_S); //設定字級功能表的記憶鍵
-        FontSize fontSize = new FontSize(mnFontSize, internalFrame);
+        FontSize fontSize = new FontSize(mnFontSize, internalEditor);
 
         JMenu mnMusic = new JMenu("音樂(M)"); //宣告音樂
         mnMusic.setMnemonic(KeyEvent.VK_M); //設定檔案功能表使用的記憶鍵
@@ -54,9 +54,9 @@ public class MDIEditor extends JFrame {
         jmb.add(mnAbout);
 
         toolBar = new JToolBar(); //新增工具列
-        toolBar.add(internalFrame.tbnSize16); //將JToggleButton按鈕加入工具列
-        toolBar.add(internalFrame.tbnSize18);
-        toolBar.add(internalFrame.tbnSize20);
+        toolBar.add(internalEditor.tbnSize16); //將JToggleButton按鈕加入工具列
+        toolBar.add(internalEditor.tbnSize18);
+        toolBar.add(internalEditor.tbnSize20);
 
         JPanel plStatus = new JPanel(new GridLayout(1, 1)); //宣告做為狀態列的JPanel
         lbStatus = new JLabel("游標位置 : 第 0 個字元"); //宣告顯示訊息的標籤
@@ -102,10 +102,10 @@ public class MDIEditor extends JFrame {
         if (result == JFileChooser.APPROVE_OPTION) {
             //使用者按下 確認 按鈕
             File file = fcSave.getSelectedFile(); //取得選取的檔案
-            internalFrame.tifCurrent.write(new FileWriter(file));
+            internalEditor.tifCurrent.write(new FileWriter(file));
             //將文字編輯內部框架的內容輸出至FileWriter物件
-            internalFrame.tifCurrent.setFileName(file.getName()); //設定編輯檔案名稱
-            internalFrame.tifCurrent.setFilePath(file.getPath()); //設定編輯檔案路徑
+            internalEditor.tifCurrent.setFileName(file.getName()); //設定編輯檔案名稱
+            internalEditor.tifCurrent.setFilePath(file.getPath()); //設定編輯檔案路徑
         }
     }
 
@@ -144,8 +144,8 @@ public class MDIEditor extends JFrame {
                                 String strPath = ((TextInternalFrame) elm).getFilePath();
                                 //取得TextInternalFrame目前編輯檔案的路徑
                                 //判斷TextInternalFrame目前編輯檔案是否為新的
-                                if (!internalFrame.tifCurrent.isNew()) {
-                                    internalFrame.tifCurrent.write(new FileWriter(strPath));
+                                if (!internalEditor.tifCurrent.isNew()) {
+                                    internalEditor.tifCurrent.write(new FileWriter(strPath));
                                     //將TextInternalFrame的內容寫入FileWriter物件
                                 } else {
                                     saveFile(strPath); //儲存檔案
@@ -172,4 +172,10 @@ public class MDIEditor extends JFrame {
             }
         }
     };
+
+    public void Exit() {//離開程式
+        processWindowEvent(new WindowEvent(MDIEditor.this, WindowEvent.WINDOW_CLOSING));
+        //執行WindowEvent事件, 觸發MDIEditor視窗框架的關閉視窗事件
+    }
+
 }

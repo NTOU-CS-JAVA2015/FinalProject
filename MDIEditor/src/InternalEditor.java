@@ -7,16 +7,7 @@ import javax.swing.event.CaretListener;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-/**
- *
- * @author yuhang
- */
-public class InternalFrame {
+public class InternalEditor {
 
     TextInternalFrame tifCurrent;
     WindowMenu wmWindow;
@@ -24,9 +15,9 @@ public class InternalFrame {
     JCheckBoxMenuItem cbmiSize16, cbmiSize18, cbmiSize20;//控制字級大小的核取方塊選項
     JToggleButton tbnSize16, tbnSize18, tbnSize20;
     Action acCut, acCopy, acPaste; //執行編輯動作的Action物件
-    
+
     //建立文字編輯內部框架
-    InternalFrame(MDIEditor MDIEditorin, WindowMenu wmWindowin) {
+    InternalEditor(MDIEditor MDIEditorin, WindowMenu wmWindowin) {
         MDIEditor = MDIEditorin;
         wmWindow = wmWindowin;
     }
@@ -109,28 +100,22 @@ public class InternalFrame {
     };
 
     //定義並宣告回應CaretEvent事件的監聽器
-    CaretListener cl = new CaretListener() {
+    CaretListener cl = (CaretEvent e) -> {
+        if (e.getDot() != e.getMark()) {
+            MDIEditor.lbStatus.setText("目前位置 : 第 " + e.getDot()
+                    + " 個字元" + ", 選取範圍 : " + e.getDot() + "至" + e.getMark());
+            //設定狀態列內的文字
 
-        //移動游標位置時, 將由此方法回應
-        @Override
-        public void caretUpdate(CaretEvent e) {
+            acCut.setEnabled(true);
+            acCopy.setEnabled(true);
+            //設定執行剪下與複製動字的Action元件為有效
+        } else {
+            MDIEditor.lbStatus.setText("目前位置 : 第 " + e.getDot() + " 個字元");
+            //設定狀態列內的文字
 
-            if (e.getDot() != e.getMark()) {
-                MDIEditor.lbStatus.setText("目前位置 : 第 " + e.getDot()
-                        + " 個字元" + ", 選取範圍 : " + e.getDot() + "至" + e.getMark());
-                //設定狀態列內的文字
-
-                acCut.setEnabled(true);
-                acCopy.setEnabled(true);
-                //設定執行剪下與複製動字的Action元件為有效
-            } else {
-                MDIEditor.lbStatus.setText("目前位置 : 第 " + e.getDot() + " 個字元");
-                //設定狀態列內的文字
-
-                acCut.setEnabled(false);
-                acCopy.setEnabled(false);
-                //設定執行剪下與複製動字的Action元件為無效
-            }
+            acCut.setEnabled(false);
+            acCopy.setEnabled(false);
+            //設定執行剪下與複製動字的Action元件為無效
         }
-    };
+    }; //移動游標位置時, 將由此方法回應
 }
