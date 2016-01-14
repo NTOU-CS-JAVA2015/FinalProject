@@ -32,7 +32,6 @@ public class MusicMenu {
     boolean scheduling = false;//判斷是否排程
     PlayMP3 player = null;
     AudioPlayer audio = null;//音樂控制項
-    
 
     MusicMenu(JMenu mnMusic, MDIEditor MDIEditorin) {
         MDIEditor = MDIEditorin;
@@ -64,7 +63,7 @@ public class MusicMenu {
                 }
                 if (!musicFlag) {
                     JFileChooser fcOpen = new JFileChooser(
-                            MDIEditor.internalFrame.tifCurrent.getFilePath());
+                            MDIEditor.internalEditor.tifCurrent.getFilePath());
                     //宣告JFileChooser物件
                     FileFilter fileFilter = MDIEditor.fileMenu.NewFileFilter("Media Files", new String[]{"mp3", "au", "aiff", "wav"});
                     fcOpen.addChoosableFileFilter(fileFilter);
