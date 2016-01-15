@@ -47,7 +47,7 @@ public class TextToPDF {
     public static void convert(File file) throws DocumentException {
         Document document = new Document();
         document.setPageSize(PageSize.A4);
-        String fileName = file.getName().replace(".txt", ".pdf");
+        String fileName = file.getName().substring(0, file.getName().length() - 3) + "pdf";
 
         FileReader reader = null;
         try {

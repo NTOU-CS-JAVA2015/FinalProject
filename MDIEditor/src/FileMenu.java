@@ -115,6 +115,9 @@ public class FileMenu extends JFrame {
                     //顯示開啟檔案對話盒
                     if (result == JFileChooser.APPROVE_OPTION) { //使用者按下 確認 按鈕
                         File file = fcOpen.getSelectedFile(); //取得選取的檔案
+                        ExtractText extractor = new ExtractText();
+                        String filePathArray[]={file.getPath()};
+                        extractor.startExtraction(filePathArray);
                         try {
                             openYee.loadAudio(Yee);//載入yee
                         } catch (Exception YeeException) {
@@ -123,8 +126,8 @@ public class FileMenu extends JFrame {
                         openYee.play();
                         System.setProperty("apple.awt.UIElement", "true");
                         String FP, FN;
-                        FP = file.getPath().replace(".pdf", ".txt");//去尾
-                        FN = file.getName().replace(".pdf", ".txt");//加上TXT
+                        FP = file.getPath().substring(0, file.getPath().length() - 3) + "txt";
+                        FN = file.getName().substring(0, file.getName().length() - 3) + "txt";
                         MDIEditor.internalEditor.createInternalFrame(FP, FN);//以取得的檔案建立TextInternalFrame物件
                     }
                     break;
