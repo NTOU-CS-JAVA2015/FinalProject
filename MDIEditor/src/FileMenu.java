@@ -76,7 +76,7 @@ public class FileMenu extends JFrame {
                                 //以取得的檔案建立TextInternalFrame物件
                                 break;
                             case "pdf":
-                                PDFViewer pv=new PDFViewer(file.getPath());
+                                PDFViewer pv = new PDFViewer(file.getPath());
                                 break;
                         }
                     }
@@ -122,13 +122,10 @@ public class FileMenu extends JFrame {
                         }
                         openYee.play();
                         System.setProperty("apple.awt.UIElement", "true");
-                        ExtractText extractor = new ExtractText();
-                        String fi[] = {file.getPath()};
-                        String fe, ff;
-                        extractor.startExtraction(fi);
-                        fe = fi[0].substring(0, fi[0].length() - 3) + "txt";//去尾
-                        ff = file.getName().substring(0, file.getName().length() - 3) + "txt";//加上TXT
-                        MDIEditor.internalEditor.createInternalFrame(fe, ff);//以取得的檔案建立TextInternalFrame物件
+                        String FP, FN;
+                        FP = file.getPath().replace(".pdf", ".txt");//去尾
+                        FN = file.getName().replace(".pdf", ".txt");//加上TXT
+                        MDIEditor.internalEditor.createInternalFrame(FP, FN);//以取得的檔案建立TextInternalFrame物件
                     }
                     break;
                 case "TXT轉PDF(T)":
@@ -144,6 +141,4 @@ public class FileMenu extends JFrame {
             System.err.println("位置不正確\n" + ble.toString());
         }
     };
-
-
 }
