@@ -275,6 +275,7 @@ public class PDFViewer {
         scrollPdf.getVerticalScrollBar().setUnitIncrement(32);
         scrollPdf.getHorizontalScrollBar().setUnitIncrement(32);
 
+        mainFrame.setTitle(filename+" - PDFdecoder version"+PdfDecoder.version );
         mainFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         mainFrame.getContentPane().add(top, BorderLayout.NORTH);
 //    mainFrame.getContentPane().add(pdf, BorderLayout.CENTER);
