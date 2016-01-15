@@ -1,5 +1,4 @@
 
-
 import java.io.InputStream;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
@@ -10,7 +9,6 @@ public class PlayMP3 {
     private final static int PLAYING = 1;
     private final static int PAUSED = 2;
     private final static int FINISHED = 3;
-
 
     // the player actually doing all the work
     private final Player player;
@@ -34,12 +32,10 @@ public class PlayMP3 {
         synchronized (playerLock) {
             switch (playerStatus) {
                 case NOTSTARTED:
-                    final Runnable r = new Runnable() {
-                        public void run() {
-                            playInternal();
-                            playerStatus = PLAYING;
-                            playInternal();
-                        }
+                    final Runnable r = () -> {
+                        playInternal();
+                        playerStatus = PLAYING;
+                        playInternal();
                     };
                     final Thread t = new Thread(r);
                     t.setDaemon(true);
@@ -58,6 +54,8 @@ public class PlayMP3 {
 
     /**
      * Pauses playback. Returns true if new state is PAUSED.
+     *
+     * @return
      */
     public boolean pause() {
         synchronized (playerLock) {
@@ -70,6 +68,8 @@ public class PlayMP3 {
 
     /**
      * Resumes playback. Returns true if the new state is PLAYING.
+     *
+     * @return
      */
     public boolean resume() {
         synchronized (playerLock) {
