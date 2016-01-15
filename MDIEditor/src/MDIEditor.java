@@ -1,7 +1,6 @@
 
 import javax.swing.*;
 import javax.swing.text.*;
-import javax.swing.filechooser.FileFilter;
 import java.io.*;
 import java.awt.*;
 import java.awt.event.*; //引用處理事件的event套件
@@ -90,7 +89,7 @@ public class MDIEditor extends JFrame {
         JFileChooser fcSave = new JFileChooser(path);  //建立檔案選取對話盒
         fcSave.setSelectedFile(new File(name)); //設定選取的檔案
 
-        FileFilter fileFilter = fileMenu.NewFileFilter("TXT File", new String[]{"txt"});
+        NewFileFilter fileFilter = new NewFileFilter("TXT File", new String[]{"txt"});
         fcSave.addChoosableFileFilter(fileFilter);
         //設定篩選檔案的類型
 

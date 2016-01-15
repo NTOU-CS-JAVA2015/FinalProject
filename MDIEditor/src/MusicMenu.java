@@ -18,7 +18,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileFilter;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.spi.mpeg.sampled.file.MpegAudioFileReader;
 
@@ -65,7 +64,7 @@ public class MusicMenu {
                     JFileChooser fcOpen = new JFileChooser(
                             MDIEditor.internalEditor.tifCurrent.getFilePath());
                     //宣告JFileChooser物件
-                    FileFilter fileFilter = MDIEditor.fileMenu.NewFileFilter("Media Files", new String[]{"mp3", "au", "aiff", "wav"});
+                    NewFileFilter fileFilter = new NewFileFilter("Media Files", new String[]{"mp3", "au", "aiff", "wav"});
                     fcOpen.addChoosableFileFilter(fileFilter);
                     //設定篩選檔案的類型
                     fcOpen.setDialogTitle("開啟音樂檔"); //設定檔案選擇對話盒的標題
