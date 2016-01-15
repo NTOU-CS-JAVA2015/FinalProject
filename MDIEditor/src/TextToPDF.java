@@ -11,7 +11,6 @@ import com.itextpdf.text.pdf.BaseFont;
 import java.io.BufferedReader;
 
 import java.io.File;
-import javax.swing.filechooser.FileFilter;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -25,18 +24,9 @@ public class TextToPDF {
         chooser.setDialogTitle("請選擇要轉檔的TXT檔");
         //檔案選擇器的Title  
         chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        chooser.setFileFilter(new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return file.getName().toLowerCase().endsWith(".txt");
-            }
-
-            @Override
-            public String getDescription() {
-                return "Text Files";
-            }
-        });
-        chooser.setAcceptAllFileFilterUsed(false);
+        NewFileFilter fileFilter = new NewFileFilter("Text Files", new String[]{"txt"});
+        chooser.setFileFilter(fileFilter);
+        //chooser.setAcceptAllFileFilterUsed(false);
         //設定檔案的過濾:只允許TXT檔案
         int response = chooser.showOpenDialog(null);
 
@@ -46,6 +36,8 @@ public class TextToPDF {
             System.out.println(fileName);
             try {
                 TextToPDF.convert(file);
+                String ff = file.getName().substring(0, file.getName().length() - 3) + "pdf";//去尾加上pdf
+                PDFViewer pv = new PDFViewer(ff);
             } catch (Exception e) {
                 System.out.println(e);
             }
@@ -91,10 +83,9 @@ public class TextToPDF {
                 paragraph.add(line);
                 paragraph.add("\n");
             }
-
             document.add(paragraph);
-
             document.close();
+
         } catch (DocumentException | IOException e) {
             System.out.println(e.toString());
         }

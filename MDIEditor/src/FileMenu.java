@@ -9,7 +9,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.filechooser.FileFilter;
 import javax.swing.text.BadLocationException;
 
 public class FileMenu extends JFrame {
@@ -58,16 +57,28 @@ public class FileMenu extends JFrame {
                     JFileChooser fcOpen = new JFileChooser(
                             MDIEditor.internalEditor.tifCurrent.getFilePath());
                     //宣告JFileChooser物件
-                    FileFilter fileFilter = NewFileFilter("TXT File", new String[]{"txt"});
+                    NewFileFilter fileFilter = new NewFileFilter("Text & PDF Files", new String[]{"txt", "pdf"});
                     fcOpen.addChoosableFileFilter(fileFilter);
+                    fcOpen.setFileSelectionMode(JFileChooser.FILES_ONLY);
                     //設定篩選檔案的類型
+                    fcOpen.setAcceptAllFileFilterUsed(false);
                     fcOpen.setDialogTitle("開啟舊檔"); //設定檔案選擇對話盒的標題
                     result = fcOpen.showOpenDialog(MDIEditor);
                     //顯示開啟檔案對話盒
                     if (result == JFileChooser.APPROVE_OPTION) { //使用者按下 確認 按鈕
                         File file = fcOpen.getSelectedFile(); //取得選取的檔案
-                        MDIEditor.internalEditor.createInternalFrame(file.getPath(), file.getName());
-                        //以取得的檔案建立TextInternalFrame物件
+                        String fi[] = {file.getPath()};//抓出字串array
+                        String fe;
+                        fe = fi[0].substring(fi[0].length() - 3, fi[0].length());//抓尾
+                        switch (fe.toLowerCase()) {
+                            case "txt":
+                                MDIEditor.internalEditor.createInternalFrame(file.getPath(), file.getName());
+                                //以取得的檔案建立TextInternalFrame物件
+                                break;
+                            case "pdf":
+                                PDFViewer pv=new PDFViewer(file.getPath());
+                                break;
+                        }
                     }
                     break;
                 }
@@ -94,7 +105,7 @@ public class FileMenu extends JFrame {
                 case "PDF轉TXT(Y)":
                     JFileChooser fcOpen = new JFileChooser(MDIEditor.internalEditor.tifCurrent.getFilePath());
                     //宣告JFileChooser物件 
-                    FileFilter fileFilter = NewFileFilter("PDF Files", new String[]{"pdf"});
+                    NewFileFilter fileFilter = new NewFileFilter("PDF Files", new String[]{"pdf"});
                     fcOpen.addChoosableFileFilter(fileFilter);
                     fcOpen.setFileSelectionMode(JFileChooser.FILES_ONLY);
                     //設定篩選檔案的類型
@@ -134,34 +145,5 @@ public class FileMenu extends JFrame {
         }
     };
 
-    //建立過濾檔案選擇對話盒內檔案類型的物件
-    public FileFilter NewFileFilter(final String desc, final String[] allowed_extensions) {
-        return new FileFilter() {//建構子
-            @Override
-            public boolean accept(File f) {//若為資料夾傳回true
-                if (f.isDirectory()) {
-                    return true;
-                }
-                int pos = f.getName().lastIndexOf('.');//尋找檔案名稱內的"."號
-                if (pos == -1) {
-                    return false;
-                } else {
-                    String extension = f.getName().substring(pos + 1);//取得檔案名稱
-                    for (String allowed_extension : allowed_extensions) {//從檔案名稱內取得副檔名字
-                        if (extension.equalsIgnoreCase(allowed_extension)) {//判斷副檔名是否與檔案篩選物件的extension字串相同
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-            }
-
-            //傳回檔案篩選物件欲篩選檔案類型的描述字串
-            @Override
-            public String getDescription() {
-                return desc;
-            }
-        };
-    }
 
 }
