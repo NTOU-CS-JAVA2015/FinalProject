@@ -65,7 +65,7 @@ public class TextToPDF {
             //設定文件標題 start
             String title = file.getName().replace(".txt", "");
             //WHY不自選字型???
-            BaseFont bfChinese = BaseFont.createFont("/font/NotoSans-Bold.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+            BaseFont bfChinese = BaseFont.createFont("/font/GenShinGothic-Regular.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
             Font font = new Font(bfChinese);
             font.setColor(BaseColor.DARK_GRAY);
             Paragraph paragraph = new Paragraph(title, font);
