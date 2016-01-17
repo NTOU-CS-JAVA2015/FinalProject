@@ -11,9 +11,11 @@ import com.itextpdf.text.pdf.BaseFont;
 import java.io.BufferedReader;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import javax.swing.JFileChooser;
 
 public class TextToPDF {
@@ -48,7 +50,7 @@ public class TextToPDF {
         Document document = new Document();
         document.setPageSize(PageSize.A4);
         String fileName = file.getName().substring(0, file.getName().length() - 3) + "pdf";
-
+/*
         FileReader reader = null;
         try {
             reader = new FileReader(file.getAbsolutePath());
@@ -57,7 +59,7 @@ public class TextToPDF {
             System.out.println(e);
             System.exit(-1);
         }
-
+*/
         try {
             PdfWriter.getInstance(document, new FileOutputStream(fileName));
 
@@ -75,7 +77,8 @@ public class TextToPDF {
 
             paragraph.setAlignment(Element.ALIGN_LEFT);
 
-            BufferedReader text = new BufferedReader(reader);
+            BufferedReader text = new BufferedReader( new InputStreamReader(
+                      new FileInputStream(file.getAbsolutePath()), "UTF8"));
 
             String line;
             while ((line = text.readLine()) != null) {
